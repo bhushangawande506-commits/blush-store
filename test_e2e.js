@@ -43,16 +43,16 @@ async function runTests() {
 
   // 3. Test Static Assets (Logo & Hero Video)
   console.log('\n3. Testing Static Assets Serving...');
-  const logoRes = await fetch('http://localhost:5000/images/brand/blush-logo.png');
-  assert(logoRes.status === 200, 'Original Blush Circular Logo is served at /images/brand/blush-logo.png');
+  const logoRes = await fetch('http://localhost:5000/images/brand/blush-logo.webp');
+  assert(logoRes.status === 200, 'Optimized Blush Circular Logo is served at /images/brand/blush-logo.webp');
   assert(logoRes.headers.get('content-type')?.includes('image'), 'Logo has image content-type');
+
+  const posterRes = await fetch('http://localhost:5000/images/hero/hero-poster.webp');
+  assert(posterRes.status === 200, 'Optimized Hero Poster is served at /images/hero/hero-poster.webp');
 
   const videoRes = await fetch('http://localhost:5000/video/blush-hero-video.mp4');
   assert(videoRes.status === 200, 'Hero Video is served at /video/blush-hero-video.mp4');
   assert(videoRes.headers.get('content-type')?.includes('video'), 'Hero video has video/mp4 content-type');
-
-  const origVideoRes = await fetch('http://localhost:5000/video/blush%20hiro%20section%20video%20desktop%20mode.mp4');
-  assert(origVideoRes.status === 200, 'Original video filename also served with 200 OK');
 
   // 4. Test Order Creation & Authoritative Calculation
   console.log('\n4. Testing Order Creation & Inventory Validation...');

@@ -5,21 +5,44 @@ import { BRAND_INFO } from '../data/products';
 export const HeroVideo = ({ onShopNow, onExplorePartywear }) => {
   const videoRef = useRef(null);
   const [isMuted, setIsMuted] = useState(true);
-  const [videoLoaded, setVideoLoaded] = useState(false);
+  const [videoPlaying, setVideoPlaying] = useState(false);
 
   useEffect(() => {
     const video = videoRef.current;
-    if (video) {
-      video.muted = true;
-      const playPromise = video.play();
-      if (playPromise !== undefined) {
-        playPromise
-          .then(() => setVideoLoaded(true))
-          .catch((err) => {
-            console.log('Autoplay deferred by browser policy:', err.message);
-          });
-      }
+    if (!video) return;
+
+    // Enforce muted on the native DOM element for strict browser autoplay compliance
+    video.muted = true;
+    video.defaultMuted = true;
+
+    let isSubscribed = true;
+
+    const playPromise = video.play();
+    if (playPromise !== undefined) {
+      playPromise
+        .then(() => {
+          if (isSubscribed) setVideoPlaying(true);
+        })
+        .catch((err) => {
+          console.log('Autoplay deferred by browser policy:', err.message);
+          // Graceful one-time listener on first user tap/click without forcing playback on scroll
+          const handleFirstInteraction = () => {
+            if (video && video.paused) {
+              video.play()
+                .then(() => {
+                  if (isSubscribed) setVideoPlaying(true);
+                })
+                .catch(() => {});
+            }
+          };
+          window.addEventListener('click', handleFirstInteraction, { once: true, passive: true });
+          window.addEventListener('touchstart', handleFirstInteraction, { once: true, passive: true });
+        });
     }
+
+    return () => {
+      isSubscribed = false;
+    };
   }, []);
 
   const toggleSound = () => {
@@ -37,17 +60,15 @@ export const HeroVideo = ({ onShopNow, onExplorePartywear }) => {
           ref={videoRef}
           className="hero-video-element"
           id="hero-fashion-video"
-          src={BRAND_INFO.heroVideo}
           poster={BRAND_INFO.heroPoster}
           autoPlay
           loop
           muted={isMuted}
+          defaultMuted
           playsInline
-          preload="auto"
-          onLoadedData={() => setVideoLoaded(true)}
+          preload="metadata"
+          onPlaying={() => setVideoPlaying(true)}
         >
-          {/* Fallback source in case of original path */}
-          <source src="/video/blush hiro section video desktop mode.mp4" type="video/mp4" />
           <source src={BRAND_INFO.heroVideo} type="video/mp4" />
           Your browser does not support HTML5 video playback.
         </video>

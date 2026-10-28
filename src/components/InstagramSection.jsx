@@ -12,12 +12,12 @@ const InstagramIcon = ({ size = 16 }) => (
 
 export const InstagramSection = () => {
   const socialImages = [
-    { src: '/images/Airy Floral Dress Portrait.png', caption: 'Floral tiers in bloom' },
-    { src: '/images/burgundy_blazer_set_1793149498559.jpg', caption: 'Sartorial burgundy power suit' },
-    { src: '/images/Sunlit Ivory Sundress in a Mediterranean Courtyard.png', caption: 'Antique ivory broderie anglaise' },
-    { src: '/images/pastel_blue_set_1793149586294.jpg', caption: 'Powder blue linen set' },
-    { src: '/images/pink_satin_blouse_1793149441010.jpg', caption: 'Liquid draped blush satin' },
-    { src: '/images/Elegant Black Dress in a Sunlit Interior.png', caption: 'The sculpted black midi' }
+    { src: '/images/Airy Floral Dress Portrait.webp', caption: 'Floral tiers in bloom' },
+    { src: '/images/burgundy_blazer_set_1793149498559.webp', caption: 'Sartorial burgundy power suit' },
+    { src: '/images/Sunlit Ivory Sundress in a Mediterranean Courtyard.webp', caption: 'Antique ivory broderie anglaise' },
+    { src: '/images/pastel_blue_set_1793149586294.webp', caption: 'Powder blue linen set' },
+    { src: '/images/pink_satin_blouse_1793149441010.webp', caption: 'Liquid draped blush satin' },
+    { src: '/images/Elegant Black Dress in a Sunlit Interior.webp', caption: 'The sculpted black midi' }
   ];
 
   return (

@@ -9,7 +9,7 @@ export const EditorialSection = ({ onExplore }) => {
           {/* Editorial Image Frame */}
           <div className="editorial-image-frame">
             <img
-              src="/images/Burgundy Elegance by Candlelight.png"
+              src="/images/Burgundy Elegance by Candlelight.webp"
               alt="Blush Evening Elegance"
               loading="lazy"
             />

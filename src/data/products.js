@@ -12,7 +12,7 @@ export const PRODUCTS = [
     description: "An editorial silhouette draped in rich crimson satin with a sweeping asymmetrical slit and delicate shoulder straps. Designed for evening affairs and sun-drenched European terraces.",
     fabric: "100% Poly-Satin with Chiffon Draped Overlay",
     care: "Dry clean only. Cool iron on reverse.",
-    images: ["/images/Golden-Hour Mediterranean Terrace Portrait.png"],
+    images: ["/images/Golden-Hour Mediterranean Terrace Portrait.webp"],
     sizes: ["XS", "S", "M", "L"],
     colors: ["Crimson Red"],
     is_featured: true,
@@ -30,9 +30,9 @@ export const PRODUCTS = [
     fabric: "Chiffon Silk Blend with Soft Cotton Voile Lining",
     care: "Hand wash cold or gentle machine cycle. Line dry.",
     images: [
-      "/images/Airy Floral Dress Portrait.png",
-      "/images/Romantic Mediterranean Summer Twirl.png",
-      "/images/Elegant Floral Dress Portrait.png"
+      "/images/Airy Floral Dress Portrait.webp",
+      "/images/Romantic Mediterranean Summer Twirl.webp",
+      "/images/Elegant Floral Dress Portrait.webp"
     ],
     sizes: ["XS", "S", "M", "L"],
     colors: ["Blush Floral"],
@@ -50,7 +50,7 @@ export const PRODUCTS = [
     description: "A timeless minimalist statement. Contoured bodycon silhouette featuring an architectural square neckline, premium sculpting ponte knit, and a modest back vent.",
     fabric: "Heavyweight Sculpt Ponte Fabric (68% Rayon, 28% Nylon, 4% Spandex)",
     care: "Machine wash cold inside out. Lay flat to dry.",
-    images: ["/images/Elegant Black Dress in a Sunlit Interior.png"],
+    images: ["/images/Elegant Black Dress in a Sunlit Interior.webp"],
     sizes: ["XS", "S", "M", "L", "XL"],
     colors: ["Classic Black"],
     is_featured: true,
@@ -67,7 +67,7 @@ export const PRODUCTS = [
     description: "Artisan eyelet lace embroidery in warm antique ivory. Flattering square neck, delicate ladder lace trim, and a tiered A-line flounce skirt.",
     fabric: "100% Broderie Anglaise Cotton with Cotton Lining",
     care: "Delicate wash in mesh bag. Warm iron.",
-    images: ["/images/Sunlit Ivory Sundress in a Mediterranean Courtyard.png"],
+    images: ["/images/Sunlit Ivory Sundress in a Mediterranean Courtyard.webp"],
     sizes: ["XS", "S", "M", "L"],
     colors: ["Antique Ivory"],
     is_featured: true,
@@ -84,7 +84,7 @@ export const PRODUCTS = [
     description: "Sweeping floor-length gown in deep wine burgundy with finely gathered corset bodice, flowing waterfall drape, and asymmetrical cascade skirt.",
     fabric: "Georgette Chiffon with Satin Lining",
     care: "Professional dry clean only.",
-    images: ["/images/Burgundy Elegance by Candlelight.png"],
+    images: ["/images/Burgundy Elegance by Candlelight.webp"],
     sizes: ["S", "M", "L", "XL"],
     colors: ["Deep Burgundy"],
     is_featured: true,
@@ -101,7 +101,7 @@ export const PRODUCTS = [
     description: "Charming French provincial floral print in dusty blue and ivory. Features romantic puff sleeves, flattering square neck, and tiered midi silhouette.",
     fabric: "100% Breathable Rayon Viscose",
     care: "Cold hand wash. Dry in shade.",
-    images: ["/images/Smiling in a Blue Floral Dress.png"],
+    images: ["/images/Smiling in a Blue Floral Dress.webp"],
     sizes: ["XS", "S", "M", "L", "XL"],
     colors: ["Dusty Blue"],
     is_featured: false,
@@ -119,8 +119,8 @@ export const PRODUCTS = [
     fabric: "Premium Compact Modal Rib Knit (95% Modal, 5% Elastane)",
     care: "Machine wash cold. Do not tumble dry.",
     images: [
-      "/images/Modern Indoor Lifestyle Portrait.png",
-      "/images/Modern Neutral Interior Portrait.png"
+      "/images/Modern Indoor Lifestyle Portrait.webp",
+      "/images/Modern Neutral Interior Portrait.webp"
     ],
     sizes: ["XS", "S", "M", "L"],
     colors: ["Jet Black"],
@@ -139,8 +139,8 @@ export const PRODUCTS = [
     fabric: "Organic Cotton Rib (96% Cotton, 4% Spandex)",
     care: "Machine wash cold with like colors.",
     images: [
-      "/images/ChatGPT Image Oct 27, 2026, 10_37_57 PM.png",
-      "/images/ChatGPT Image Oct 27, 2026, 10_57_56 PM.png"
+      "/images/ChatGPT Image Oct 27, 2026, 10_37_57 PM.webp",
+      "/images/ChatGPT Image Oct 27, 2026, 10_57_56 PM.webp"
     ],
     sizes: ["XS", "S", "M", "L"],
     colors: ["Berry Burgundy"],
@@ -159,8 +159,8 @@ export const PRODUCTS = [
     fabric: "100% High-Thread Count Cotton Poplin",
     care: "Dry clean or gentle wash. Steam iron.",
     images: [
-      "/images/ChatGPT Image Oct 27, 2026, 11_02_51 PM.png",
-      "/images/Sunlit Modern Fashion Portrait.png"
+      "/images/ChatGPT Image Oct 27, 2026, 11_02_51 PM.webp",
+      "/images/Sunlit Modern Fashion Portrait.webp"
     ],
     sizes: ["XS", "S", "M", "L"],
     colors: ["Optic White"],
@@ -178,7 +178,7 @@ export const PRODUCTS = [
     description: "A fluid, liquid-silk draped cowl neck blouse in delicate blush pastel pink. Tailored long sleeves with elongated button cuffs for refined luxury.",
     fabric: "Silk-Touch Poly Satin",
     care: "Dry clean recommended or hand wash with mild silk detergent.",
-    images: ["/images/pink_satin_blouse_1793149441010.jpg"],
+    images: ["/images/pink_satin_blouse_1793149441010.webp"],
     sizes: ["XS", "S", "M", "L"],
     colors: ["Blush Pink"],
     is_featured: true,
@@ -196,9 +196,9 @@ export const PRODUCTS = [
     fabric: "Micro-Modal Ribbed Blend",
     care: "Machine wash delicate.",
     images: [
-      "/images/ChatGPT Image Oct 27, 2026, 10_43_40 PM.png",
-      "/images/ChatGPT Image Oct 27, 2026, 10_50_49 PM.png",
-      "/images/Sunlit Sage Lookbook Stroll.png"
+      "/images/ChatGPT Image Oct 27, 2026, 10_43_40 PM.webp",
+      "/images/ChatGPT Image Oct 27, 2026, 10_50_49 PM.webp",
+      "/images/Sunlit Sage Lookbook Stroll.webp"
     ],
     sizes: ["XS", "S", "M", "L"],
     colors: ["Sage Green"],
@@ -216,7 +216,7 @@ export const PRODUCTS = [
     description: "Effortlessly tailored two-piece set in pure natural beige linen. Includes relaxed single-button blazer and high-waisted front-pleated wide-leg trousers.",
     fabric: "100% Pure French Flax Linen",
     care: "Dry clean or cold delicate cycle. Hang to dry.",
-    images: ["/images/ChatGPT Image Oct 27, 2026, 10_40_01 PM.png"],
+    images: ["/images/ChatGPT Image Oct 27, 2026, 10_40_01 PM.webp"],
     sizes: ["XS", "S", "M", "L", "XL"],
     colors: ["Natural Beige"],
     is_featured: true,
@@ -233,7 +233,7 @@ export const PRODUCTS = [
     description: "Sharp sartorial suiting tailored in deep wine burgundy. Single-breasted peak lapel blazer paired with elongating pleated wide trousers.",
     fabric: "Fine Poly-Viscose Suiting with Stretch Silk Lining",
     care: "Specialist dry clean only.",
-    images: ["/images/burgundy_blazer_set_1793149498559.jpg"],
+    images: ["/images/burgundy_blazer_set_1793149498559.webp"],
     sizes: ["S", "M", "L"],
     colors: ["Wine Burgundy"],
     is_featured: true,
@@ -250,7 +250,7 @@ export const PRODUCTS = [
     description: "Sun-drenched Mediterranean charm in serene powder blue linen. Features structured square-neck crop top and high-waist A-line midi skirt with thigh slit.",
     fabric: "Premium Washed Linen-Cotton Blend",
     care: "Gentle cold wash. Line dry in shade.",
-    images: ["/images/pastel_blue_set_1793149586294.jpg"],
+    images: ["/images/pastel_blue_set_1793149586294.webp"],
     sizes: ["XS", "S", "M", "L"],
     colors: ["Powder Blue"],
     is_featured: true,
@@ -267,7 +267,7 @@ export const PRODUCTS = [
     description: "Crisp accordion sunburst pleats that billow with every stride. High-waisted elasticized grosgrain waistband and flattering midi length.",
     fabric: "Permanent Pleat Georgette Chiffon with Soft Satin Lining",
     care: "Hand wash cold. Do not iron pleats.",
-    images: ["/images/ChatGPT Image Oct 27, 2026, 11_02_51 PM.png"],
+    images: ["/images/ChatGPT Image Oct 27, 2026, 11_02_51 PM.webp"],
     sizes: ["XS", "S", "M", "L"],
     colors: ["Noir Black"],
     is_featured: false,
@@ -284,7 +284,7 @@ export const PRODUCTS = [
     description: "Bias-cut fluid skirt falling in a rich chocolate brown liquid sheen. Designed to hug the hips before gently flaring into an effortless midi hemline.",
     fabric: "Heavyweight Poly-Satin (Anti-Static Finish)",
     care: "Cold hand wash with delicate silk detergent.",
-    images: ["/images/Burgundy Elegance by Candlelight.png"],
+    images: ["/images/Burgundy Elegance by Candlelight.webp"],
     sizes: ["XS", "S", "M", "L"],
     colors: ["Rich Chocolate"],
     is_featured: false,
@@ -301,7 +301,7 @@ export const PRODUCTS = [
     description: "Tiered romantic floral midi skirt with soft gathers and a fluid flared drape. Versatile for casual garden brunches or weekend styling.",
     fabric: "Chiffon with Light Cotton Voile Lining",
     care: "Machine wash cold delicate.",
-    images: ["/images/ChatGPT Image Oct 27, 2026, 09_48_52 PM.png"],
+    images: ["/images/ChatGPT Image Oct 27, 2026, 09_48_52 PM.webp"],
     sizes: ["XS", "S", "M", "L"],
     colors: ["Rose Garden Print"],
     is_featured: false,
@@ -318,7 +318,7 @@ export const PRODUCTS = [
     description: "Sculpted cocktail dress tailored with clean lines, square neckline, and understated modern elegance. Perfect for dinners and festive galas.",
     fabric: "Sculpting Crepe Ponte with Elastane",
     care: "Professional dry clean.",
-    images: ["/images/Elegant Black Dress in a Sunlit Interior.png"],
+    images: ["/images/Elegant Black Dress in a Sunlit Interior.webp"],
     sizes: ["XS", "S", "M", "L"],
     colors: ["Onyx Black"],
     is_featured: true,
@@ -335,7 +335,7 @@ export const PRODUCTS = [
     description: "Opulent wine burgundy party silhouette with cascading fluid layers, structured bodice, and graceful movement under evening lights.",
     fabric: "Luxe Georgette and Liquid Chiffon",
     care: "Dry clean only.",
-    images: ["/images/Burgundy Elegance by Candlelight.png"],
+    images: ["/images/Burgundy Elegance by Candlelight.webp"],
     sizes: ["S", "M", "L"],
     colors: ["Wine Burgundy"],
     is_featured: true,
@@ -352,7 +352,7 @@ export const PRODUCTS = [
     description: "Festive ivory celebration dress embellished with delicate tonal embroidery, scalloped trims, and a playful tiered silhouette.",
     fabric: "Cotton Voile with Fine Silk Embroidery",
     care: "Dry clean or hand wash cold inside out.",
-    images: ["/images/Sunlit Ivory Sundress in a Mediterranean Courtyard.png"],
+    images: ["/images/Sunlit Ivory Sundress in a Mediterranean Courtyard.webp"],
     sizes: ["XS", "S", "M", "L"],
     colors: ["Ivory Gold"],
     is_featured: true,
@@ -366,35 +366,35 @@ export const CATEGORIES = [
     id: "dresses",
     name: "Dresses",
     description: "From sun-drenched daywear to sculpted evening midi dresses.",
-    image: "/images/categories/dresses.png",
+    image: "/images/categories/dresses.webp",
     count: 6
   },
   {
     id: "tops",
     name: "Tops",
     description: "Structured off-shoulder silhouettes, fluid satin blouses, and ribbed staples.",
-    image: "/images/categories/tops.png",
+    image: "/images/categories/tops.webp",
     count: 5
   },
   {
     id: "co-ord-sets",
     name: "Co-ord Sets",
     description: "Effortless tailored suits, linen pairings, and skirt sets.",
-    image: "/images/categories/co-ord-sets.png",
+    image: "/images/categories/co-ord-sets.webp",
     count: 3
   },
   {
     id: "skirts",
     name: "Skirts",
     description: "Accordion pleats, fluid bias-cut satin, and floral gathers.",
-    image: "/images/categories/skirts.png",
+    image: "/images/categories/skirts.webp",
     count: 3
   },
   {
     id: "partywear",
     name: "Partywear",
     description: "Statement cocktail gowns and opulent eveningwear.",
-    image: "/images/categories/partywear.png",
+    image: "/images/categories/partywear.webp",
     count: 3
   }
 ];
@@ -408,7 +408,7 @@ export const BRAND_INFO = {
   whatsappUrl: "https://wa.me/919503917333",
   instagram: "@blushpune",
   instagramUrl: "https://www.instagram.com/blushpune/",
-  logo: "/images/brand/blush-logo.png",
+  logo: "/images/brand/blush-logo.webp",
   heroVideo: "/video/blush-hero-video.mp4",
-  heroPoster: "/images/hero/hero-poster.png"
+  heroPoster: "/images/hero/hero-poster.webp"
 };
