@@ -1,0 +1,31 @@
+{
+  "name": "blush",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "dev:server": "node server/server.js",
+    "dev:client": "vite --port 3000 --host",
+    "dev": "vite --port 3000 --host",
+    "start": "node server/server.js",
+    "build": "vite build",
+    "preview": "vite preview",
+    "seed": "node server/seed.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "@vitejs/plugin-react": "^6.1.2",
+    "cors": "^2.8.6",
+    "dotenv": "^18.0.9",
+    "express": "^5.3.0",
+    "lucide-react": "^1.62.0",
+    "razorpay": "^2.9.8",
+    "react": "^19.3.1",
+    "react-dom": "^19.3.1",
+    "sqlite3": "^6.0.1",
+    "vite": "^8.3.5"
+  }
+}
