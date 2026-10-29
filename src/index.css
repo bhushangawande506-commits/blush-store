@@ -355,6 +355,9 @@ img, video {
   .hero-section {
     min-height: 75vh;
   }
+  .hero-video-element {
+    object-position: center 15%;
+  }
 }
 
 .hero-video-wrapper {
@@ -370,9 +373,8 @@ img, video {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  object-position: center;
+  object-position: center 8%;
   opacity: 0.88;
-  transform: scale(1.02);
   transition: opacity 0.8s ease;
 }
 
@@ -399,7 +401,7 @@ img, video {
   max-width: 720px;
   padding: 2.5rem 1.25rem;
   color: #fff;
-  transform: translateY(80px);
+  transform: translateY(145px);
 }
 
 .hero-badge {
@@ -465,7 +467,7 @@ img, video {
 @media (max-width: 480px) {
   .hero-content {
     padding: 2rem 1rem;
-    transform: translateY(20px);
+    transform: translateY(65px);
   }
   .hero-title {
     font-size: clamp(1.65rem, 6.2vw, 2.1rem);
