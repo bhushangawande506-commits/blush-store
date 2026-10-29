@@ -3,33 +3,45 @@ import { ShoppingBag, Search, Heart, Menu, X, Phone } from 'lucide-react';
 import { useCart } from '../context/CartContext';
 import { BRAND_INFO } from '../data/products';
 
-export const Header = ({ currentView, setCurrentView, selectedCategory, setSelectedCategory, onOpenSearch }) => {
+export const Header = ({
+  currentView,
+  selectedCategory,
+  filterMode = 'all',
+  onNavigate,
+  onOpenSearch
+}) => {
   const { totalItemsCount, setIsCartOpen, wishlist } = useCart();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
+  // Exact 5 primary navigation destinations as specified:
+  // HOME | SHOP ALL | NEW ARRIVALS | BEST SELLERS | ABOUT
   const navItems = [
-    { label: 'Home', view: 'home' },
-    { label: 'Shop All', view: 'shop', category: 'All' },
-    { label: 'Dresses', view: 'shop', category: 'Dresses' },
-    { label: 'Tops', view: 'shop', category: 'Tops' },
-    { label: 'Co-ord Sets', view: 'shop', category: 'Co-ord Sets' },
-    { label: 'Skirts', view: 'shop', category: 'Skirts' },
-    { label: 'Partywear', view: 'shop', category: 'Partywear' },
-    { label: 'About', view: 'about' }
+    { label: 'Home', view: 'home', id: 'home', path: '/' },
+    { label: 'Shop All', view: 'shop', category: 'All', filterMode: 'all', id: 'shop-all', path: '/shop' },
+    { label: 'New Arrivals', view: 'shop', category: 'All', filterMode: 'new_arrivals', id: 'new-arrivals', path: '/shop?filter=new-arrivals' },
+    { label: 'Best Sellers', view: 'shop', category: 'All', filterMode: 'best_sellers', id: 'best-sellers', path: '/shop?filter=best-sellers' },
+    { label: 'About', view: 'about', id: 'about', path: '/about' }
   ];
 
-  const handleNavClick = (item) => {
-    setCurrentView(item.view);
-    if (item.category) {
-      setSelectedCategory(item.category);
-    }
+  const handleItemClick = (item) => {
     setMobileMenuOpen(false);
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    onNavigate(item);
+  };
+
+  const isItemActive = (item) => {
+    if (currentView === 'home' && item.id === 'home') return true;
+    if (currentView === 'about' && item.id === 'about') return true;
+    if (currentView === 'shop') {
+      if (filterMode === 'new_arrivals' && item.id === 'new-arrivals') return true;
+      if (filterMode === 'best_sellers' && item.id === 'best-sellers') return true;
+      if (filterMode === 'all' && item.id === 'shop-all') return true;
+    }
+    return false;
   };
 
   return (
     <>
-      <header className="header" id="main-header">
+      <header className="header" id="main-header" role="banner">
         <div className="container">
           <div className="header-inner">
             {/* Mobile Hamburger Button */}
@@ -38,19 +50,20 @@ export const Header = ({ currentView, setCurrentView, selectedCategory, setSelec
               id="mobile-menu-toggle-btn"
               onClick={() => setMobileMenuOpen(true)}
               aria-label="Open mobile navigation menu"
+              aria-expanded={mobileMenuOpen}
+              aria-controls="mobile-navigation-drawer"
             >
               <Menu size={24} />
             </button>
 
             {/* Brand Logo & Wordmark */}
             <a
-              href="#home"
+              href="/"
               className="header-brand"
               id="header-brand-logo-link"
               onClick={(e) => {
                 e.preventDefault();
-                setCurrentView('home');
-                window.scrollTo({ top: 0, behavior: 'smooth' });
+                handleItemClick(navItems[0]); // Home
               }}
             >
               <img
@@ -65,20 +78,17 @@ export const Header = ({ currentView, setCurrentView, selectedCategory, setSelec
               </div>
             </a>
 
-            {/* Desktop Navigation */}
+            {/* Desktop Navigation: HOME | SHOP ALL | NEW ARRIVALS | BEST SELLERS | ABOUT */}
             <nav className="nav-desktop" aria-label="Main Navigation">
               <ul className="nav-links-desktop">
                 {navItems.map((item) => {
-                  const isActive =
-                    currentView === item.view &&
-                    (!item.category || selectedCategory === item.category);
-
+                  const active = isItemActive(item);
                   return (
-                    <li key={item.label}>
+                    <li key={item.id}>
                       <button
-                        className={`nav-link ${isActive ? 'active' : ''}`}
-                        id={`nav-link-${item.label.toLowerCase().replace(/\s+/g, '-')}`}
-                        onClick={() => handleNavClick(item)}
+                        className={`nav-link ${active ? 'active' : ''}`}
+                        id={`nav-link-${item.id}`}
+                        onClick={() => handleItemClick(item)}
                       >
                         {item.label}
                       </button>
@@ -106,8 +116,10 @@ export const Header = ({ currentView, setCurrentView, selectedCategory, setSelec
                 className="action-btn"
                 id="header-wishlist-btn"
                 onClick={() => {
-                  setCurrentView('shop');
-                  window.scrollTo({ top: 500, behavior: 'smooth' });
+                  handleItemClick({ view: 'shop', category: 'All', filterMode: 'all', path: '/shop' });
+                  setTimeout(() => {
+                    window.scrollTo({ top: 400, behavior: 'smooth' });
+                  }, 100);
                 }}
                 title="Saved Wishlist"
                 aria-label="Wishlist"
@@ -138,11 +150,21 @@ export const Header = ({ currentView, setCurrentView, selectedCategory, setSelec
 
       {/* Mobile Slide-Over Drawer */}
       {mobileMenuOpen && (
-        <div className="cart-drawer-backdrop" onClick={() => setMobileMenuOpen(false)}>
+        <div
+          className="cart-drawer-backdrop"
+          onClick={() => setMobileMenuOpen(false)}
+          role="dialog"
+          aria-modal="true"
+          aria-label="Navigation Menu"
+        >
           <div
             className="cart-drawer"
             id="mobile-navigation-drawer"
-            style={{ left: 0, right: 'auto', animation: 'slideInLeft 0.3s cubic-bezier(0.16, 1, 0.3, 1)' }}
+            style={{
+              left: 0,
+              right: 'auto',
+              animation: 'slideInLeft 0.3s cubic-bezier(0.16, 1, 0.3, 1)'
+            }}
             onClick={(e) => e.stopPropagation()}
           >
             <div className="cart-header">
@@ -169,26 +191,38 @@ export const Header = ({ currentView, setCurrentView, selectedCategory, setSelec
               </button>
             </div>
 
-            <div className="cart-body" style={{ padding: '2rem 1.5rem' }}>
+            <div className="cart-body" style={{ padding: '2rem 1.5rem', display: 'flex', flexDirection: 'column', height: 'calc(100% - 75px)' }}>
               <ul style={{ listStyle: 'none', display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
-                {navItems.map((item) => (
-                  <li key={item.label}>
-                    <button
-                      id={`mobile-nav-${item.label.toLowerCase().replace(/\s+/g, '-')}`}
-                      onClick={() => handleNavClick(item)}
-                      style={{
-                        fontFamily: 'var(--font-editorial)',
-                        fontSize: '1.5rem',
-                        fontWeight: '500',
-                        color: 'var(--color-near-black)',
-                        width: '100%',
-                        textAlign: 'left'
-                      }}
-                    >
-                      {item.label}
-                    </button>
-                  </li>
-                ))}
+                {navItems.map((item) => {
+                  const active = isItemActive(item);
+                  return (
+                    <li key={item.id}>
+                      <button
+                        id={`mobile-nav-${item.id}`}
+                        onClick={() => handleItemClick(item)}
+                        style={{
+                          fontFamily: 'var(--font-editorial)',
+                          fontSize: '1.45rem',
+                          fontWeight: active ? '600' : '400',
+                          color: active ? 'var(--color-brand-red)' : 'var(--color-near-black)',
+                          width: '100%',
+                          textAlign: 'left',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'space-between',
+                          padding: '0.25rem 0'
+                        }}
+                      >
+                        <span>{item.label}</span>
+                        {active && (
+                          <span style={{ fontSize: '0.7rem', textTransform: 'uppercase', color: 'var(--color-brand-red)', letterSpacing: '0.1em' }}>
+                            • Active
+                          </span>
+                        )}
+                      </button>
+                    </li>
+                  );
+                })}
               </ul>
 
               <div style={{ marginTop: 'auto', paddingTop: '2rem', borderTop: '1px solid var(--color-border)' }}>
@@ -197,7 +231,14 @@ export const Header = ({ currentView, setCurrentView, selectedCategory, setSelec
                 </p>
                 <a
                   href={`tel:${BRAND_INFO.phone}`}
-                  style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.9rem', color: 'var(--color-near-black)' }}
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '8px',
+                    fontSize: '0.9rem',
+                    color: 'var(--color-near-black)',
+                    fontWeight: '500'
+                  }}
                 >
                   <Phone size={16} /> {BRAND_INFO.formattedPhone}
                 </a>

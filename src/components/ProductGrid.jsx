@@ -1,6 +1,6 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { ProductCard } from './ProductCard';
-import { Search, SlidersHorizontal, RotateCcw } from 'lucide-react';
+import { Search, SlidersHorizontal, RotateCcw, Sparkles } from 'lucide-react';
 
 export const ProductGrid = ({
   products,
@@ -8,12 +8,25 @@ export const ProductGrid = ({
   setSelectedCategory,
   onSelectProduct,
   title = "Shop All Designs",
-  subtitle = "Explore our complete curated boutique collection."
+  subtitle = "Explore our complete curated boutique collection.",
+  filterMode = "all", // 'all' | 'new_arrivals' | 'best_sellers'
+  onClearFilterMode
 }) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedSize, setSelectedSize] = useState('ALL');
-  const [sortBy, setSortBy] = useState('featured');
+  const [sortBy, setSortBy] = useState(
+    filterMode === 'new_arrivals' ? 'newest' : 'featured'
+  );
   const [maxPrice, setMaxPrice] = useState(6000);
+
+  // Sync sortBy if filterMode changes
+  useEffect(() => {
+    if (filterMode === 'new_arrivals') {
+      setSortBy('newest');
+    } else if (filterMode === 'best_sellers') {
+      setSortBy('featured');
+    }
+  }, [filterMode]);
 
   const categories = ['All', 'Dresses', 'Tops', 'Co-ord Sets', 'Skirts', 'Partywear'];
   const sizes = ['ALL', 'XS', 'S', 'M', 'L', 'XL'];
@@ -22,13 +35,22 @@ export const ProductGrid = ({
   const filteredProducts = useMemo(() => {
     return products
       .filter((item) => {
-        // Category
+        // Filter mode (New Arrivals vs Best Sellers)
+        if (filterMode === 'new_arrivals' && !item.is_new_arrival) {
+          return false;
+        }
+        if (filterMode === 'best_sellers' && !item.is_featured) {
+          return false;
+        }
+
+        // Category filter
         if (selectedCategory && selectedCategory !== 'All') {
           if (item.category.toLowerCase() !== selectedCategory.toLowerCase()) {
             return false;
           }
         }
-        // Search
+
+        // Search query
         if (searchQuery.trim()) {
           const q = searchQuery.toLowerCase();
           const matchName = item.name.toLowerCase().includes(q);
@@ -36,11 +58,13 @@ export const ProductGrid = ({
           const matchFab = item.fabric?.toLowerCase().includes(q);
           if (!matchName && !matchDesc && !matchFab) return false;
         }
-        // Size
+
+        // Size filter
         if (selectedSize !== 'ALL') {
           if (!item.sizes?.includes(selectedSize)) return false;
         }
-        // Price
+
+        // Price filter
         if (item.price > maxPrice) return false;
 
         return true;
@@ -52,7 +76,7 @@ export const ProductGrid = ({
         // Default featured
         return (b.is_featured ? 1 : 0) - (a.is_featured ? 1 : 0);
       });
-  }, [products, selectedCategory, searchQuery, selectedSize, maxPrice, sortBy]);
+  }, [products, selectedCategory, searchQuery, selectedSize, maxPrice, sortBy, filterMode]);
 
   const resetFilters = () => {
     setSelectedCategory('All');
@@ -60,6 +84,15 @@ export const ProductGrid = ({
     setSelectedSize('ALL');
     setMaxPrice(6000);
     setSortBy('featured');
+    if (onClearFilterMode) onClearFilterMode();
+  };
+
+  const handleCategorySelect = (cat) => {
+    setSelectedCategory(cat);
+    // If selecting a specific category while in a specialized filter mode, clear the mode to show full category
+    if (filterMode !== 'all' && onClearFilterMode) {
+      onClearFilterMode();
+    }
   };
 
   const hasActiveFilters =
@@ -67,15 +100,31 @@ export const ProductGrid = ({
     searchQuery !== '' ||
     selectedSize !== 'ALL' ||
     maxPrice < 6000 ||
-    sortBy !== 'featured';
+    filterMode !== 'all' ||
+    (sortBy !== 'featured' && filterMode !== 'new_arrivals');
+
+  // Dynamic heading & subtitle based on navigation filter
+  let displayTitle = title;
+  let displaySubtitle = subtitle;
+  let displayEyebrow = "Boutique Catalogue";
+
+  if (filterMode === 'new_arrivals') {
+    displayEyebrow = "Latest Releases";
+    displayTitle = "New Arrivals";
+    displaySubtitle = "Recently introduced garments, seasonal silhouettes, and fresh boutique arrivals.";
+  } else if (filterMode === 'best_sellers') {
+    displayEyebrow = "Curated Favorites";
+    displayTitle = "Best Sellers & Signature Edits";
+    displaySubtitle = "Our most cherished western silhouettes, iconic occasionwear, and popular boutique cuts.";
+  }
 
   return (
     <section className="section" id="product-grid-section">
       <div className="container">
         <div className="section-header">
-          <p className="section-eyebrow">Boutique Catalogue</p>
-          <h2 className="section-title">{title}</h2>
-          <p className="section-desc">{subtitle}</p>
+          <p className="section-eyebrow">{displayEyebrow}</p>
+          <h2 className="section-title">{displayTitle}</h2>
+          <p className="section-desc">{displaySubtitle}</p>
         </div>
 
         {/* Filters and Search Bar */}
@@ -93,21 +142,21 @@ export const ProductGrid = ({
             />
           </div>
 
-          {/* Category Filter Pills */}
+          {/* Category Filter Pills (Full access to all categories) */}
           <div className="category-filter-pills" id="category-filter-pills">
             {categories.map((cat) => (
               <button
                 key={cat}
                 className={`filter-pill ${selectedCategory === cat ? 'active' : ''}`}
                 id={`filter-category-${cat.toLowerCase().replace(/\s+/g, '-')}`}
-                onClick={() => setSelectedCategory(cat)}
+                onClick={() => handleCategorySelect(cat)}
               >
                 {cat}
               </button>
             ))}
           </div>
 
-          {/* Size Filter Dropdown / Pills */}
+          {/* Size Filter Pills */}
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
             <span style={{ fontSize: '0.78rem', color: 'var(--color-secondary-grey)' }}>Size:</span>
             <div style={{ display: 'flex', gap: '4px' }}>
@@ -144,7 +193,14 @@ export const ProductGrid = ({
                 className="filter-pill"
                 id="clear-all-filters-btn"
                 onClick={resetFilters}
-                style={{ display: 'flex', alignItems: 'center', gap: '4px', backgroundColor: '#FEE2E2', color: '#B91C1C', borderColor: '#FECACA' }}
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '4px',
+                  backgroundColor: '#FEE2E2',
+                  color: '#B91C1C',
+                  borderColor: '#FECACA'
+                }}
               >
                 <RotateCcw size={12} /> Clear Filters
               </button>
@@ -153,9 +209,31 @@ export const ProductGrid = ({
         </div>
 
         {/* Results Counter */}
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem', fontSize: '0.82rem', color: 'var(--color-secondary-grey)' }}>
-          <span>Showing <strong>{filteredProducts.length}</strong> of {products.length} distinctive garments</span>
-          {selectedCategory !== 'All' && <span>Category: <strong>{selectedCategory}</strong></span>}
+        <div
+          style={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            marginBottom: '1.5rem',
+            fontSize: '0.82rem',
+            color: 'var(--color-secondary-grey)',
+            flexWrap: 'wrap',
+            gap: '8px'
+          }}
+        >
+          <span>
+            Showing <strong>{filteredProducts.length}</strong> of {products.length} distinctive garments
+          </span>
+          <div style={{ display: 'flex', gap: '12px' }}>
+            {selectedCategory !== 'All' && (
+              <span>Category: <strong>{selectedCategory}</strong></span>
+            )}
+            {filterMode !== 'all' && (
+              <span style={{ color: 'var(--color-brand-red)', fontWeight: '600' }}>
+                Filter: {filterMode === 'new_arrivals' ? 'New Arrivals' : 'Best Sellers'}
+              </span>
+            )}
+          </div>
         </div>
 
         {/* Product Grid */}
@@ -170,10 +248,20 @@ export const ProductGrid = ({
             ))}
           </div>
         ) : (
-          <div style={{ textAlign: 'center', padding: '4rem 1rem', backgroundColor: 'var(--color-soft-cream)', borderRadius: '4px' }} id="empty-product-state">
-            <h3 style={{ fontFamily: 'var(--font-editorial)', fontSize: '1.8rem', marginBottom: '0.5rem' }}>No garments matched your filter</h3>
+          <div
+            style={{
+              textAlign: 'center',
+              padding: '4rem 1rem',
+              backgroundColor: 'var(--color-soft-cream)',
+              borderRadius: '4px'
+            }}
+            id="empty-product-state"
+          >
+            <h3 style={{ fontFamily: 'var(--font-editorial)', fontSize: '1.8rem', marginBottom: '0.5rem' }}>
+              No garments matched your filter
+            </h3>
             <p style={{ maxWidth: '420px', margin: '0 auto 1.5rem' }}>
-              We could not find any products matching your current search or size criteria. Try resetting filters to explore all 20 designs.
+              We could not find any products matching your current criteria. Try resetting filters to explore all boutique designs.
             </p>
             <button className="btn-primary" onClick={resetFilters}>
               Reset All Filters

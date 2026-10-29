@@ -1,21 +1,30 @@
 import React from 'react';
-import { Heart, Plus } from 'lucide-react';
+import { Heart } from 'lucide-react';
 import { useCart } from '../context/CartContext';
 
 export const ProductCard = ({ product, onSelectProduct }) => {
   const { wishlist, toggleWishlist, addToCart } = useCart();
   const isWishlisted = wishlist.includes(product.id);
 
-  const mainImage = product.images?.[0] || '/images/hero/hero-poster.png';
-  const hasMultipleImages = product.images?.length > 1;
-  const hoverImage = hasMultipleImages ? product.images[1] : mainImage;
+  const mainImage = product.images?.[0] || '/images/hero/hero-poster.webp';
+  const productUrl = `/product/${product.slug || product.id}`;
+
+  const handleCardClick = (e) => {
+    if (e.metaKey || e.ctrlKey || e.shiftKey) return; // Allow opening in new tab
+    e.preventDefault();
+    if (onSelectProduct) {
+      onSelectProduct(product);
+    }
+  };
 
   return (
     <div className="product-card" id={`product-card-${product.id}`}>
       {/* Product Image Frame */}
-      <div
+      <a
+        href={productUrl}
         className="product-image-container"
-        onClick={() => onSelectProduct(product)}
+        onClick={handleCardClick}
+        aria-label={`View details for ${product.name}`}
       >
         <img
           src={mainImage}
@@ -34,20 +43,32 @@ export const ProductCard = ({ product, onSelectProduct }) => {
 
         {/* Wishlist Heart Toggle */}
         <button
+          type="button"
           className={`wishlist-btn ${isWishlisted ? 'active' : ''}`}
           id={`wishlist-btn-${product.id}`}
           onClick={(e) => {
+            e.preventDefault();
             e.stopPropagation();
             toggleWishlist(product.id);
           }}
           title={isWishlisted ? 'Remove from wishlist' : 'Save to wishlist'}
-          aria-label="Toggle wishlist"
+          aria-label={isWishlisted ? 'Remove from wishlist' : 'Save to wishlist'}
         >
-          <Heart size={16} fill={isWishlisted ? '#E50914' : 'none'} color={isWishlisted ? '#E50914' : '#171717'} />
+          <Heart
+            size={16}
+            fill={isWishlisted ? '#E50914' : 'none'}
+            color={isWishlisted ? '#E50914' : '#171717'}
+          />
         </button>
 
         {/* Quick Add Sizes on Hover */}
-        <div className="quick-add-overlay" onClick={(e) => e.stopPropagation()}>
+        <div
+          className="quick-add-overlay"
+          onClick={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+          }}
+        >
           <span style={{ color: '#fff', fontSize: '0.68rem', textAlign: 'center', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
             Quick Add Size:
           </span>
@@ -55,9 +76,11 @@ export const ProductCard = ({ product, onSelectProduct }) => {
             {(product.sizes || ['XS', 'S', 'M', 'L']).map((sz) => (
               <button
                 key={sz}
+                type="button"
                 className="quick-size-btn"
                 id={`quick-add-${product.id}-${sz}`}
                 onClick={(e) => {
+                  e.preventDefault();
                   e.stopPropagation();
                   addToCart(product, sz, 1);
                 }}
@@ -67,17 +90,19 @@ export const ProductCard = ({ product, onSelectProduct }) => {
             ))}
           </div>
         </div>
-      </div>
+      </a>
 
       {/* Product Info */}
       <div className="product-info">
         <span className="product-category-label">{product.category}</span>
-        <h3
-          className="product-title"
-          id={`product-title-${product.id}`}
-          onClick={() => onSelectProduct(product)}
-        >
-          {product.name}
+        <h3 className="product-title" id={`product-title-${product.id}`}>
+          <a
+            href={productUrl}
+            onClick={handleCardClick}
+            style={{ color: 'inherit', textDecoration: 'none' }}
+          >
+            {product.name}
+          </a>
         </h3>
 
         <div className="product-price-row">
