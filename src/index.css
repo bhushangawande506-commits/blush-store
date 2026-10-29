@@ -629,16 +629,20 @@ img, video {
   color: var(--color-secondary-grey);
 }
 
-/* Category Grid */
+/* ===================================================================
+   CATEGORY GRID — EDITORIAL 5-COLUMN SHOWCASE
+=================================================================== */
 .category-grid {
   display: grid;
   grid-template-columns: repeat(5, 1fr);
   gap: 1.25rem;
+  width: 100%;
 }
 
 @media (max-width: 1024px) {
   .category-grid {
     grid-template-columns: repeat(3, 1fr);
+    gap: 1.15rem;
   }
 }
 
@@ -651,63 +655,160 @@ img, video {
 
 .category-card {
   position: relative;
-  aspect-ratio: 3 / 4;
+  display: flex;
+  flex-direction: column;
+  background-color: #FAF0E8;
+  border-radius: 18px;
   overflow: hidden;
-  border-radius: 4px;
-  background-color: var(--color-soft-cream);
+  box-shadow: 0 4px 20px rgba(23, 23, 23, 0.05);
   cursor: pointer;
-  group: hover;
+  transition: transform var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.category-card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 12px 30px rgba(23, 23, 23, 0.1);
+}
+
+.category-card-media {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1 / 1.5;
+  overflow: hidden;
+  background-color: var(--color-soft-cream);
+}
+
+@media (max-width: 640px) {
+  .category-card-media {
+    aspect-ratio: 1 / 1.35;
+  }
 }
 
 .category-card-img {
   width: 100%;
   height: 100%;
   object-fit: cover;
+  object-position: center 10%;
   transition: transform var(--transition-slow);
+  display: block;
 }
 
 .category-card:hover .category-card-img {
-  transform: scale(1.08);
+  transform: scale(1.06);
 }
 
-.category-card-overlay {
+/* Individual Category Image Framing, Alignment & Zoom */
+.category-card-img-dresses {
+  object-position: 74% center;
+}
+
+.category-card-img-tops {
+  object-position: center 10%;
+}
+
+.category-card-img-co-ord-sets {
+  object-position: center 10%;
+}
+
+.category-card-img-skirts {
+  object-position: center 15%;
+  transform: scale(1.18);
+  transform-origin: center 25%;
+}
+
+.category-card:hover .category-card-img-skirts {
+  transform: scale(1.25);
+}
+
+.category-card-img-partywear {
+  object-position: 68% center;
+}
+
+@media (max-width: 640px) {
+  .category-card-img-skirts {
+    transform: scale(1.14);
+    transform-origin: center 25%;
+  }
+
+  .category-card:hover .category-card-img-skirts {
+    transform: scale(1.20);
+  }
+}
+
+.category-card-footer {
+  position: relative;
+  background-color: #FAF0E8;
+  z-index: 2;
+  margin-top: -2px;
+}
+
+.category-card-curve {
   position: absolute;
-  inset: 0;
-  background: linear-gradient(
-    180deg,
-    rgba(23, 23, 23, 0) 40%,
-    rgba(23, 23, 23, 0.75) 100%
-  );
+  top: -34px;
+  left: 0;
+  width: 100%;
+  height: 36px;
+  display: block;
+  fill: #FAF0E8;
+  pointer-events: none;
+}
+
+.category-card-footer-content {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.4rem 1.15rem 1.15rem;
+}
+
+@media (max-width: 640px) {
+  .category-card-footer-content {
+    padding: 0.35rem 0.85rem 0.95rem;
+  }
+}
+
+.category-card-info {
   display: flex;
   flex-direction: column;
-  justify-content: flex-end;
-  padding: 1.25rem;
-  color: #fff;
-  transition: background var(--transition-smooth);
-}
-
-.category-card:hover .category-card-overlay {
-  background: linear-gradient(
-    180deg,
-    rgba(229, 9, 20, 0.15) 0%,
-    rgba(23, 23, 23, 0.85) 100%
-  );
+  gap: 0.2rem;
 }
 
 .category-card-title {
   font-family: var(--font-editorial);
-  font-size: 1.4rem;
+  font-size: 1.3rem;
   font-weight: 500;
-  color: #fff;
-  line-height: 1.1;
-  margin-bottom: 0.25rem;
+  color: var(--color-near-black);
+  line-height: 1.15;
+  margin: 0;
+  letter-spacing: -0.01em;
+}
+
+@media (max-width: 768px) {
+  .category-card-title {
+    font-size: 1.15rem;
+  }
 }
 
 .category-card-count {
-  font-size: 0.75rem;
-  letter-spacing: 0.08em;
+  font-family: var(--font-sans);
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
   text-transform: uppercase;
-  color: rgba(255, 255, 255, 0.75);
+  color: #8A8580;
+}
+
+.category-card-arrow {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-near-black);
+  opacity: 0.75;
+  transition: transform var(--transition-fast), opacity var(--transition-fast);
+}
+
+.category-card:hover .category-card-arrow {
+  transform: translateX(4px);
+  opacity: 1;
 }
 
 /* ===================================================================
