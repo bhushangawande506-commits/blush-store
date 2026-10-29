@@ -124,60 +124,60 @@ export const InstagramSection = () => {
         <div className="instagram-embed-grid" id="instagram-posts-container">
           {INSTAGRAM_POSTS_CONFIG.map((post) => (
             <div key={post.id} className="instagram-embed-card" id={`instagram-card-${post.id}`}>
-              <blockquote
-                className="instagram-media"
-                data-instgrm-captioned
-                data-instgrm-permalink={post.permalink}
-                data-instgrm-version="14"
-                style={{
-                  background: '#FFFDFC',
-                  border: '1px solid var(--color-border)',
-                  borderRadius: '6px',
-                  boxShadow: '0 2px 8px rgba(23, 23, 23, 0.04)',
-                  margin: '0 auto',
-                  width: '100%',
-                  maxWidth: '540px',
-                  minWidth: '260px',
-                  padding: '0'
-                }}
-              >
-                {/* Fallback card rendered while embed script loads or if blocked by client privacy tools */}
-                <div className="instagram-fallback-card">
-                  <div className="instagram-card-top">
-                    <div className="instagram-card-brand">
-                      <div className="instagram-avatar">
-                        <img src={BRAND_INFO.logo} alt="Blush Pune" />
+              <div className="instagram-embed-wrapper">
+                <blockquote
+                  className="instagram-media"
+                  data-instgrm-permalink={post.permalink}
+                  data-instgrm-version="14"
+                  style={{
+                    background: '#FFFDFC',
+                    border: 'none',
+                    borderRadius: '0px',
+                    margin: '0 auto',
+                    width: '100%',
+                    maxWidth: '540px',
+                    minWidth: '260px',
+                    padding: '0'
+                  }}
+                >
+                  {/* Fallback card rendered while embed script loads or if blocked by client privacy tools */}
+                  <div className="instagram-fallback-card">
+                    <div className="instagram-card-top">
+                      <div className="instagram-card-brand">
+                        <div className="instagram-avatar">
+                          <img src={BRAND_INFO.logo} alt="Blush Pune" />
+                        </div>
+                        <div>
+                          <span className="instagram-author">blushpune</span>
+                          <span className="instagram-tag">
+                            {post.type === 'reel' ? 'Instagram Reel' : 'Instagram Post'} • Pune
+                          </span>
+                        </div>
                       </div>
-                      <div>
-                        <span className="instagram-author">blushpune</span>
-                        <span className="instagram-tag">
-                          {post.type === 'reel' ? 'Instagram Reel' : 'Instagram Post'} • Pune
-                        </span>
+                      <InstagramIcon size={18} />
+                    </div>
+
+                    <div className="instagram-card-body">
+                      <div className="instagram-pill">
+                        <Sparkles size={11} style={{ color: 'var(--color-brand-red)' }} />
+                        <span>{post.category}</span>
                       </div>
+                      <p className="instagram-caption">{post.caption}</p>
                     </div>
-                    <InstagramIcon size={18} />
-                  </div>
 
-                  <div className="instagram-card-body">
-                    <div className="instagram-pill">
-                      <Sparkles size={11} style={{ color: 'var(--color-brand-red)' }} />
-                      <span>{post.category}</span>
+                    <div className="instagram-card-footer">
+                      <a
+                        href={post.permalink}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="instagram-view-cta"
+                      >
+                        View {post.type === 'reel' ? 'Reel' : 'Post'} on Instagram <ExternalLink size={12} />
+                      </a>
                     </div>
-                    <p className="instagram-caption">{post.caption}</p>
                   </div>
-
-                  <div className="instagram-card-footer">
-                    <a
-                      href={post.permalink}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="instagram-view-cta"
-                    >
-                      View {post.type === 'reel' ? 'Reel' : 'Post'} on Instagram <ExternalLink size={12} />
-                    </a>
-                  </div>
-                </div>
-              </blockquote>
+                </blockquote>
+              </div>
             </div>
           ))}
         </div>
