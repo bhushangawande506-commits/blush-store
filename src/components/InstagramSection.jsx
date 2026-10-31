@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { MessageCircle, ExternalLink, Heart, Send, Bookmark, Play } from 'lucide-react';
+import { MessageCircle, ExternalLink, Heart, Send, Bookmark } from 'lucide-react';
 import { BRAND_INFO } from '../data/products';
 import { INSTAGRAM_POSTS_CONFIG } from '../data/instagramPosts';
 
@@ -43,7 +43,7 @@ export const InstagramSection = () => {
       <div className="insta-accent-callout" aria-hidden="true">
         <span>Style</span><br />
         <span>Inspiration</span><br />
-        <span>Updates 💕</span>
+        <span>Updates ❤️</span>
       </div>
 
       <div className="container">
@@ -73,7 +73,7 @@ export const InstagramSection = () => {
               id="instagram-profile-link"
               style={{ display: 'inline-flex', alignItems: 'center', gap: '8px' }}
             >
-              <InstagramIcon size={16} /> Follow on Instagram <ExternalLink size={14} />
+              <InstagramIcon size={16} /> FOLLOW ON INSTAGRAM <ExternalLink size={14} />
             </a>
             <a
               href={`${BRAND_INFO.whatsappUrl}?text=${encodeURIComponent(
@@ -101,7 +101,7 @@ export const InstagramSection = () => {
                 id={`instagram-card-${post.id}`}
                 data-instgrm-permalink={post.permalink}
               >
-                {/* Card Top: Brand avatar, handle, subtitle & View profile button */}
+                {/* Card Top: Brand avatar, handle & solid black View profile button */}
                 <div className="insta-card-header">
                   <a
                     href={BRAND_INFO.instagramUrl}
@@ -113,10 +113,7 @@ export const InstagramSection = () => {
                     <div className="insta-card-avatar">
                       <img src={BRAND_INFO.logo} alt="Blush Pune" />
                     </div>
-                    <div className="insta-card-meta">
-                      <span className="insta-card-name">blushpune</span>
-                      <span className="insta-card-sub">{post.subtitle || 'blushpune'}</span>
-                    </div>
+                    <span className="insta-card-name">blushpune</span>
                   </a>
 
                   <a
@@ -129,13 +126,13 @@ export const InstagramSection = () => {
                   </a>
                 </div>
 
-                {/* Card Media: 1:1 Aspect Ratio thumbnail with Reel play badge */}
+                {/* Card Media: Edge-to-edge uncropped fashion image preserving head-to-toe outfits */}
                 <a
                   href={post.permalink}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="insta-card-media"
-                  aria-label={`View ${post.category} on Instagram`}
+                  aria-label={`View outfit on Instagram`}
                 >
                   <img
                     src={post.image}
@@ -143,24 +140,10 @@ export const InstagramSection = () => {
                     className="insta-card-img"
                     loading="lazy"
                   />
-                  {post.type === 'reel' && (
-                    <div className="insta-play-badge" title="Watch reel on Instagram">
-                      <Play size={16} fill="white" strokeWidth={0} />
-                    </div>
-                  )}
                 </a>
 
-                {/* Card Footer: View more on Instagram link & Action icons */}
+                {/* Card Footer: Simple row of Instagram-style outline icons */}
                 <div className="insta-card-footer">
-                  <a
-                    href={post.permalink}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="insta-card-permalink"
-                  >
-                    View more on Instagram
-                  </a>
-
                   <div className="insta-card-actions">
                     <div className="insta-card-actions-left">
                       <button
@@ -171,10 +154,10 @@ export const InstagramSection = () => {
                         title={isLiked ? "Liked" : "Like"}
                       >
                         <Heart
-                          size={18}
+                          size={19}
                           fill={isLiked ? "#E50914" : "none"}
-                          stroke={isLiked ? "#E50914" : "#262626"}
-                          strokeWidth={isLiked ? 0 : 1.75}
+                          stroke={isLiked ? "#E50914" : "#111111"}
+                          strokeWidth={1.5}
                         />
                       </button>
 
@@ -186,7 +169,7 @@ export const InstagramSection = () => {
                         aria-label="Comment on Instagram"
                         title="Comment"
                       >
-                        <MessageCircle size={18} stroke="#262626" strokeWidth={1.75} />
+                        <MessageCircle size={19} stroke="#111111" strokeWidth={1.5} />
                       </a>
 
                       <a
@@ -197,7 +180,7 @@ export const InstagramSection = () => {
                         aria-label="Share on Instagram"
                         title="Share"
                       >
-                        <Send size={18} stroke="#262626" strokeWidth={1.75} />
+                        <Send size={19} stroke="#111111" strokeWidth={1.5} />
                       </a>
                     </div>
 
@@ -209,7 +192,7 @@ export const InstagramSection = () => {
                       aria-label="Save on Instagram"
                       title="Save"
                     >
-                      <Bookmark size={18} stroke="#262626" strokeWidth={1.75} />
+                      <Bookmark size={19} stroke="#111111" strokeWidth={1.5} />
                     </a>
                   </div>
                 </div>

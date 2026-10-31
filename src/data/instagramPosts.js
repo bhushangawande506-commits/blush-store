@@ -5,56 +5,50 @@
 export const INSTAGRAM_POSTS_CONFIG = [
   {
     id: 'post-1',
-    type: 'reel',
+    type: 'post',
     permalink: 'https://www.instagram.com/reel/DNsGm8S5toB/',
-    caption: 'Curated boutique styling & occasionwear reel at @blushpune',
+    caption: 'Signature red flared bohemian printed dress by Blush Pune',
     category: 'Occasionwear',
-    image: '/images/instagram/post-1.webp',
-    subtitle: 'Reels'
+    image: '/images/instagram/post-1.webp'
   },
   {
     id: 'post-2',
     type: 'post',
     permalink: 'https://www.instagram.com/p/De_1BHbDBbY/',
-    caption: 'Signature western silhouette lookbook & fit showcase',
+    caption: 'Boutique racks filled with pastel resortwear and evening dresses',
     category: 'New Drops',
-    image: '/images/instagram/post-2.webp',
-    subtitle: '5,376 followers'
+    image: '/images/instagram/post-2.webp'
   },
   {
     id: 'post-3',
-    type: 'reel',
+    type: 'post',
     permalink: 'https://www.instagram.com/reel/De6TvkisVDh/',
-    caption: 'Boutique collection spotlight & studio fitting session',
+    caption: 'Timeless black square-neck tiered maxi dress for evening soirees',
     category: 'Lookbook',
-    image: '/images/instagram/post-3.webp',
-    subtitle: 'Abeer Arora • Rangana'
+    image: '/images/instagram/post-3.webp'
   },
   {
     id: 'post-4',
     type: 'post',
     permalink: 'https://www.instagram.com/p/DeZKiVfDPDp/',
-    caption: 'Evening wear & contemporary cuts crafted in Pune',
+    caption: 'Lilac tiered ruffled dress against rustic stone backdrop',
     category: 'Evening Wear',
-    image: '/images/instagram/post-4.webp',
-    subtitle: 'blushpune'
+    image: '/images/instagram/post-4.webp'
   },
   {
     id: 'post-5',
-    type: 'reel',
+    type: 'post',
     permalink: 'https://www.instagram.com/reel/Db9tw6wsMeH/',
-    caption: 'Tailored silhouettes & luxury fabric drape in motion',
+    caption: 'Contemporary western styling in rich red knit top and ivory palazzo trousers',
     category: 'Studio Craft',
-    image: '/images/instagram/post-5.webp',
-    subtitle: 'Fitness & Fashionology'
+    image: '/images/instagram/post-5.webp'
   },
   {
     id: 'post-6',
-    type: 'reel',
+    type: 'post',
     permalink: 'https://www.instagram.com/reel/DbxVpywsqvK/',
-    caption: 'Occasionwear and signature western edits from BLUSH',
+    caption: 'Delicate peach floral tiered sundress with puffed sleeves',
     category: 'Editorial',
-    image: '/images/instagram/post-6.webp',
-    subtitle: 'OMAN LAY • Sooo'
+    image: '/images/instagram/post-6.webp'
   }
 ];
