@@ -39,16 +39,19 @@ export const Footer = ({ onSelectCategory, onOpenPolicy }) => {
               partywear, and coordinated sets designed for memorable occasions.
             </p>
 
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', fontSize: '0.85rem' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: 'rgba(255, 255, 255, 0.85)' }}>
-                <MapPin size={16} style={{ color: '#E50914' }} />
-                <span>Pune, Maharashtra, India</span>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', fontSize: '0.85rem' }}>
+              <div style={{ display: 'flex', alignItems: 'flex-start', gap: '8px', color: 'rgba(255, 255, 255, 0.85)' }}>
+                <MapPin size={16} style={{ color: '#E50914', flexShrink: 0, marginTop: '2px' }} />
+                <span style={{ lineHeight: '1.45', maxWidth: '320px' }}>
+                  Shop. No-5, Liberty -2, North Main Road,<br /> Koregaon Park, Pune, India, 411001
+                </span>
               </div>
               <a
                 href={`tel:${BRAND_INFO.phone}`}
-                style={{ display: 'flex', alignItems: 'center', gap: '8px', color: 'rgba(255, 255, 255, 0.85)' }}
+                id="footer-contact-phone"
+                style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', color: 'rgba(255, 255, 255, 0.85)' }}
               >
-                <Phone size={16} style={{ color: '#E50914' }} />
+                <Phone size={16} style={{ color: '#E50914', flexShrink: 0 }} />
                 <span>Direct Contact: {BRAND_INFO.formattedPhone}</span>
               </a>
             </div>
@@ -154,6 +157,7 @@ export const Footer = ({ onSelectCategory, onOpenPolicy }) => {
                 href={BRAND_INFO.instagramUrl}
                 target="_blank"
                 rel="noopener noreferrer"
+                id="footer-instagram-link"
                 style={{
                   display: 'inline-flex',
                   alignItems: 'center',

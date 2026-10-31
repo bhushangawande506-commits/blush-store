@@ -401,11 +401,12 @@ export const CATEGORIES = [
 
 export const BRAND_INFO = {
   name: "Blush",
-  location: "Pune, Maharashtra, India",
+  location: "Shop. No-5, Liberty -2, North Main Road, Koregaon Park, Pune, India, 411001",
+  address: "Shop. No-5, Liberty -2, North Main Road, Koregaon Park, Pune, India, 411001",
   established: 2014,
-  phone: "9503917333",
-  formattedPhone: "+91 95039 17333",
-  whatsappUrl: "https://wa.me/919503917333",
+  phone: "+918552027788",
+  formattedPhone: "+91 85520 27788",
+  whatsappUrl: "https://wa.me/918552027788",
   instagram: "@blushpune",
   instagramUrl: "https://www.instagram.com/blushpune/",
   logo: "/images/brand/blush-logo.webp",

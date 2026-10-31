@@ -1,9 +1,9 @@
-import React, { useEffect, useState } from 'react';
-import { MessageCircle, ExternalLink, Sparkles } from 'lucide-react';
+import React, { useState } from 'react';
+import { MessageCircle, ExternalLink, Heart, Send, Bookmark, Play } from 'lucide-react';
 import { BRAND_INFO } from '../data/products';
 import { INSTAGRAM_POSTS_CONFIG } from '../data/instagramPosts';
 
-const InstagramIcon = ({ size = 16 }) => (
+const InstagramIcon = ({ size = 16, style = {} }) => (
   <svg
     width={size}
     height={size}
@@ -13,6 +13,7 @@ const InstagramIcon = ({ size = 16 }) => (
     strokeWidth="2"
     strokeLinecap="round"
     strokeLinejoin="round"
+    style={style}
   >
     <rect width="20" height="20" x="2" y="2" rx="5" ry="5" />
     <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z" />
@@ -21,61 +22,30 @@ const InstagramIcon = ({ size = 16 }) => (
 );
 
 export const InstagramSection = () => {
-  const [scriptLoaded, setScriptLoaded] = useState(false);
+  const [likedPosts, setLikedPosts] = useState({});
 
-  useEffect(() => {
-    // Process embeds safely
-    const processInstagramEmbeds = () => {
-      if (window.instgrm && window.instgrm.Embeds) {
-        try {
-          window.instgrm.Embeds.process();
-        } catch (e) {
-          console.warn('Instagram Embeds.process caught error:', e);
-        }
-      }
-    };
-
-    // Load official Instagram embed script only once
-    const SCRIPT_ID = 'instagram-embed-script';
-    let scriptElement = document.getElementById(SCRIPT_ID);
-
-    if (!scriptElement) {
-      scriptElement = document.createElement('script');
-      scriptElement.id = SCRIPT_ID;
-      scriptElement.src = 'https://www.instagram.com/embed.js';
-      scriptElement.async = true;
-      scriptElement.onload = () => {
-        setScriptLoaded(true);
-        processInstagramEmbeds();
-      };
-      scriptElement.onerror = () => {
-        console.warn('Instagram embed script failed to load (possibly blocked by privacy/ad-blocking extensions).');
-      };
-      document.body.appendChild(scriptElement);
-    } else {
-      setScriptLoaded(true);
-      processInstagramEmbeds();
-    }
-
-    // Schedule processing after React mounts and reflows
-    const timer1 = setTimeout(processInstagramEmbeds, 200);
-    const timer2 = setTimeout(processInstagramEmbeds, 700);
-    const timer3 = setTimeout(processInstagramEmbeds, 1500);
-
-    return () => {
-      clearTimeout(timer1);
-      clearTimeout(timer2);
-      clearTimeout(timer3);
-    };
-  }, []);
+  const toggleLike = (postId, e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setLikedPosts((prev) => ({
+      ...prev,
+      [postId]: !prev[postId]
+    }));
+  };
 
   return (
     <section
-      className="section"
+      className="section instagram-section"
       id="instagram-community-section"
-      style={{ backgroundColor: 'var(--color-warm-white)', overflow: 'hidden' }}
       aria-label="Instagram Community Gallery"
     >
+      {/* Decorative cursive script accent on top right */}
+      <div className="insta-accent-callout" aria-hidden="true">
+        <span>Style</span><br />
+        <span>Inspiration</span><br />
+        <span>Updates 💕</span>
+      </div>
+
       <div className="container">
         {/* Section Header */}
         <div className="section-header" style={{ marginBottom: '2.5rem' }}>
@@ -122,64 +92,149 @@ export const InstagramSection = () => {
 
         {/* Responsive Gallery Grid: 6 Unique Public Posts and Reels */}
         <div className="instagram-embed-grid" id="instagram-posts-container">
-          {INSTAGRAM_POSTS_CONFIG.map((post) => (
-            <div key={post.id} className="instagram-embed-card" id={`instagram-card-${post.id}`}>
-              <div className="instagram-embed-wrapper">
-                <blockquote
-                  className="instagram-media"
-                  data-instgrm-permalink={post.permalink}
-                  data-instgrm-version="14"
-                  style={{
-                    background: '#FFFDFC',
-                    border: 'none',
-                    borderRadius: '0px',
-                    margin: '0 auto',
-                    width: '100%',
-                    maxWidth: '540px',
-                    minWidth: '260px',
-                    padding: '0'
-                  }}
+          {INSTAGRAM_POSTS_CONFIG.map((post) => {
+            const isLiked = likedPosts[post.id];
+            return (
+              <article
+                key={post.id}
+                className="instagram-embed-card"
+                id={`instagram-card-${post.id}`}
+                data-instgrm-permalink={post.permalink}
+              >
+                {/* Card Top: Brand avatar, handle, subtitle & View profile button */}
+                <div className="insta-card-header">
+                  <a
+                    href={BRAND_INFO.instagramUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="insta-card-user"
+                    title="View @blushpune profile"
+                  >
+                    <div className="insta-card-avatar">
+                      <img src={BRAND_INFO.logo} alt="Blush Pune" />
+                    </div>
+                    <div className="insta-card-meta">
+                      <span className="insta-card-name">blushpune</span>
+                      <span className="insta-card-sub">{post.subtitle || 'blushpune'}</span>
+                    </div>
+                  </a>
+
+                  <a
+                    href={BRAND_INFO.instagramUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="insta-card-follow-btn"
+                  >
+                    View profile
+                  </a>
+                </div>
+
+                {/* Card Media: 1:1 Aspect Ratio thumbnail with Reel play badge */}
+                <a
+                  href={post.permalink}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="insta-card-media"
+                  aria-label={`View ${post.category} on Instagram`}
                 >
-                  {/* Fallback card rendered while embed script loads or if blocked by client privacy tools */}
-                  <div className="instagram-fallback-card">
-                    <div className="instagram-card-top">
-                      <div className="instagram-card-brand">
-                        <div className="instagram-avatar">
-                          <img src={BRAND_INFO.logo} alt="Blush Pune" />
-                        </div>
-                        <div>
-                          <span className="instagram-author">blushpune</span>
-                          <span className="instagram-tag">
-                            {post.type === 'reel' ? 'Instagram Reel' : 'Instagram Post'} • Pune
-                          </span>
-                        </div>
-                      </div>
-                      <InstagramIcon size={18} />
+                  <img
+                    src={post.image}
+                    alt={post.caption}
+                    className="insta-card-img"
+                    loading="lazy"
+                  />
+                  {post.type === 'reel' && (
+                    <div className="insta-play-badge" title="Watch reel on Instagram">
+                      <Play size={16} fill="white" strokeWidth={0} />
                     </div>
+                  )}
+                </a>
 
-                    <div className="instagram-card-body">
-                      <div className="instagram-pill">
-                        <Sparkles size={11} style={{ color: 'var(--color-brand-red)' }} />
-                        <span>{post.category}</span>
-                      </div>
-                      <p className="instagram-caption">{post.caption}</p>
-                    </div>
+                {/* Card Footer: View more on Instagram link & Action icons */}
+                <div className="insta-card-footer">
+                  <a
+                    href={post.permalink}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="insta-card-permalink"
+                  >
+                    View more on Instagram
+                  </a>
 
-                    <div className="instagram-card-footer">
+                  <div className="insta-card-actions">
+                    <div className="insta-card-actions-left">
+                      <button
+                        type="button"
+                        onClick={(e) => toggleLike(post.id, e)}
+                        className={`insta-action-btn ${isLiked ? 'liked' : ''}`}
+                        aria-label={isLiked ? "Unlike post" : "Like post"}
+                        title={isLiked ? "Liked" : "Like"}
+                      >
+                        <Heart
+                          size={18}
+                          fill={isLiked ? "#E50914" : "none"}
+                          stroke={isLiked ? "#E50914" : "#262626"}
+                          strokeWidth={isLiked ? 0 : 1.75}
+                        />
+                      </button>
+
                       <a
                         href={post.permalink}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="instagram-view-cta"
+                        className="insta-action-btn"
+                        aria-label="Comment on Instagram"
+                        title="Comment"
                       >
-                        View {post.type === 'reel' ? 'Reel' : 'Post'} on Instagram <ExternalLink size={12} />
+                        <MessageCircle size={18} stroke="#262626" strokeWidth={1.75} />
+                      </a>
+
+                      <a
+                        href={post.permalink}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="insta-action-btn"
+                        aria-label="Share on Instagram"
+                        title="Share"
+                      >
+                        <Send size={18} stroke="#262626" strokeWidth={1.75} />
                       </a>
                     </div>
+
+                    <a
+                      href={post.permalink}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="insta-action-btn"
+                      aria-label="Save on Instagram"
+                      title="Save"
+                    >
+                      <Bookmark size={18} stroke="#262626" strokeWidth={1.75} />
+                    </a>
                   </div>
-                </blockquote>
-              </div>
-            </div>
-          ))}
+                </div>
+              </article>
+            );
+          })}
+        </div>
+
+        {/* Bottom CTA Button: Instagram Gradient Pill with Sparkle Accents */}
+        <div className="insta-bottom-cta-wrapper">
+          <div className="insta-cta-inner">
+            <span className="insta-sparkle-decor insta-sparkle-left" aria-hidden="true">✦ ✧</span>
+            <a
+              href={BRAND_INFO.instagramUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="btn-instagram-gradient"
+              id="instagram-explore-cta"
+            >
+              <InstagramIcon size={18} />
+              <span>EXPLORE MORE ON INSTAGRAM</span>
+              <ExternalLink size={15} />
+            </a>
+            <span className="insta-sparkle-decor insta-sparkle-right" aria-hidden="true">✧ ✦</span>
+          </div>
         </div>
       </div>
     </section>

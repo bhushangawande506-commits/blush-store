@@ -50,7 +50,7 @@ export const PolicyModal = ({ policyType, onClose }) => {
           </ul>
           <h4 style={{ fontWeight: '700', marginTop: '1rem', marginBottom: '0.25rem' }}>Initiating an Exchange</h4>
           <p style={{ fontSize: '0.88rem', lineHeight: '1.6' }}>
-            Contact our WhatsApp concierge at 9503917333 with your order ID and the new requested size.
+            Contact our WhatsApp concierge at +91 85520 27788 with your order ID and the new requested size.
           </p>
         </div>
       )
@@ -69,7 +69,7 @@ export const PolicyModal = ({ policyType, onClose }) => {
           <div>
             <h4 style={{ fontWeight: '700', fontSize: '0.95rem' }}>How can I order via WhatsApp?</h4>
             <p style={{ fontSize: '0.88rem', lineHeight: '1.6' }}>
-              You can click any "Order on WhatsApp" button on a product page or contact us directly at 9503917333. Our team will verify size availability and assist with your order.
+              You can click any "Order on WhatsApp" button on a product page or contact us directly at +91 85520 27788. Our team will verify size availability and assist with your order.
             </p>
           </div>
           <div>
