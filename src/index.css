@@ -57,6 +57,22 @@ body {
   overflow-x: hidden;
 }
 
+/* ===================================================================
+   ACCESSIBILITY UTILITY CLASSES (Screen-Reader-Only)
+=================================================================== */
+.sr-only,
+.visually-hidden {
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  padding: 0 !important;
+  margin: -1px !important;
+  overflow: hidden !important;
+  clip: rect(0, 0, 0, 0) !important;
+  white-space: nowrap !important;
+  border: 0 !important;
+}
+
 /* Typography Helpers */
 h1, h2, h3, h4, .font-editorial {
   font-family: var(--font-editorial);
@@ -1036,50 +1052,166 @@ img, video {
 }
 
 /* ===================================================================
-   FILTER & SEARCH BAR (SHOP ALL PAGE)
+   FILTER & SEARCH BAR (SHOP ALL PAGE - DESKTOP & MOBILE)
 =================================================================== */
 .shop-controls-bar {
   background-color: var(--color-soft-cream);
-  padding: 1.25rem;
-  border-radius: 4px;
-  margin-bottom: 2.5rem;
+  padding: 1rem 1.25rem;
+  border-radius: 6px;
+  border: 1px solid var(--color-border);
+  margin-bottom: 1.25rem;
   display: flex;
-  flex-wrap: wrap;
   align-items: center;
   justify-content: space-between;
-  gap: 1rem;
+  gap: 1.25rem;
+}
+
+.shop-controls-bar-desktop {
+  display: flex;
 }
 
 .search-input-wrapper {
   position: relative;
   flex: 1;
-  min-width: 240px;
-  max-width: 400px;
+  min-width: 200px;
+  max-width: 460px;
+  display: flex;
+  align-items: center;
 }
 
 .search-input-wrapper svg {
   position: absolute;
-  left: 12px;
+  left: 14px;
   top: 50%;
   transform: translateY(-50%);
   color: var(--color-secondary-grey);
+  pointer-events: none;
 }
 
 .search-input {
   width: 100%;
-  padding: 0.65rem 1rem 0.65rem 2.4rem;
+  padding: 0.7rem 2.4rem 0.7rem 2.5rem;
   background-color: #fff;
   border: 1px solid var(--color-border);
-  border-radius: 2px;
+  border-radius: 4px;
   font-size: 0.88rem;
   color: var(--color-near-black);
+  transition: all var(--transition-fast);
 }
 
 .search-input:focus {
   outline: none;
-  border-color: var(--color-brand-red);
+  border-color: var(--color-near-black);
+  box-shadow: 0 0 0 1px var(--color-near-black);
 }
 
+.search-clear-inline-btn {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: transparent;
+  border: none;
+  color: var(--color-secondary-grey);
+  cursor: pointer;
+  padding: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: all var(--transition-fast);
+}
+
+.search-clear-inline-btn:hover {
+  background-color: rgba(0, 0, 0, 0.06);
+  color: var(--color-near-black);
+}
+
+.desktop-controls-right {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  flex-shrink: 0;
+}
+
+/* Desktop Filter Toggle Button */
+.desktop-filter-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  padding: 0.65rem 1.15rem;
+  background-color: #FFFFFF;
+  border: 1px solid var(--color-border);
+  border-radius: 4px;
+  font-size: 0.84rem;
+  font-weight: 600;
+  color: var(--color-near-black);
+  cursor: pointer;
+  letter-spacing: 0.02em;
+  transition: all var(--transition-fast);
+  user-select: none;
+}
+
+.desktop-filter-btn:hover {
+  border-color: var(--color-near-black);
+  background-color: #FAF8F5;
+}
+
+.desktop-filter-btn.active {
+  background-color: var(--color-near-black);
+  color: #FFFFFF;
+  border-color: var(--color-near-black);
+}
+
+.desktop-filter-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 19px;
+  height: 19px;
+  padding: 0 5px;
+  background-color: var(--color-brand-red);
+  color: #FFFFFF;
+  font-size: 0.72rem;
+  font-weight: 700;
+  border-radius: 9999px;
+  line-height: 1;
+}
+
+.desktop-filter-btn.active .desktop-filter-badge {
+  background-color: #FFFFFF;
+  color: var(--color-near-black);
+}
+
+.desktop-sort-wrapper {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+}
+
+.desktop-sort-wrapper .sort-select {
+  padding: 0.65rem 1.25rem;
+  background-color: #FFFFFF;
+  border: 1px solid var(--color-border);
+  border-radius: 4px;
+  font-size: 0.84rem;
+  font-weight: 500;
+  color: var(--color-near-black);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.desktop-sort-wrapper .sort-select:hover {
+  border-color: var(--color-near-black);
+}
+
+.desktop-sort-wrapper .sort-select:focus {
+  outline: none;
+  border-color: var(--color-near-black);
+  box-shadow: 0 0 0 1px var(--color-near-black);
+}
+
+/* Category Filter Pills */
 .category-filter-pills {
   display: flex;
   gap: 0.5rem;
@@ -1087,15 +1219,16 @@ img, video {
 }
 
 .filter-pill {
-  padding: 0.5rem 1rem;
+  padding: 0.45rem 0.85rem;
   background-color: #fff;
   border: 1px solid var(--color-border);
   border-radius: 9999px;
   font-size: 0.78rem;
   font-weight: 600;
-  letter-spacing: 0.04em;
+  letter-spacing: 0.03em;
   color: var(--color-near-black);
   transition: all var(--transition-fast);
+  cursor: pointer;
 }
 
 .filter-pill:hover, .filter-pill.active {
@@ -1108,11 +1241,374 @@ img, video {
   padding: 0.65rem 1.2rem;
   background-color: #fff;
   border: 1px solid var(--color-border);
-  border-radius: 2px;
+  border-radius: 4px;
   font-size: 0.82rem;
   font-weight: 500;
   color: var(--color-near-black);
   cursor: pointer;
+}
+
+/* ===================================================================
+   DESKTOP ACTIVE FILTER CHIPS BAR
+=================================================================== */
+.desktop-active-chips-bar {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 1.25rem;
+  padding: 0.4rem 0;
+  flex-wrap: wrap;
+}
+
+.active-chips-label {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  font-weight: 700;
+  color: var(--color-secondary-grey);
+}
+
+.active-chips-list {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.active-filter-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.35rem 0.65rem 0.35rem 0.75rem;
+  background-color: var(--color-soft-cream);
+  border: 1px solid var(--color-border);
+  border-radius: 9999px;
+  font-size: 0.76rem;
+  color: var(--color-near-black);
+  letter-spacing: 0.01em;
+}
+
+.active-filter-chip strong {
+  font-weight: 600;
+}
+
+.active-filter-chip-mode {
+  background-color: rgba(229, 9, 20, 0.08);
+  border-color: rgba(229, 9, 20, 0.2);
+  color: var(--color-brand-red);
+}
+
+.chip-remove-btn {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  color: var(--color-secondary-grey);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2px;
+  border-radius: 50%;
+  transition: all var(--transition-fast);
+}
+
+.chip-remove-btn:hover {
+  background-color: rgba(0, 0, 0, 0.1);
+  color: var(--color-near-black);
+}
+
+.clear-all-chips-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.35rem 0.75rem;
+  background-color: #FEE2E2;
+  border: 1px solid #FECACA;
+  border-radius: 9999px;
+  font-size: 0.74rem;
+  font-weight: 600;
+  color: #B91C1C;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.clear-all-chips-btn:hover {
+  background-color: #FCDCDC;
+  border-color: #F87171;
+}
+
+/* ===================================================================
+   DESKTOP EXPANDABLE FILTER PANEL
+=================================================================== */
+.desktop-filter-panel {
+  background-color: #FFFFFF;
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.06);
+  padding: 1.5rem 1.75rem;
+  margin-bottom: 1.5rem;
+  animation: desktopFilterSlideDown 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes desktopFilterSlideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.desktop-filter-panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid var(--color-border-subtle);
+  margin-bottom: 1.25rem;
+}
+
+.desktop-filter-panel-title {
+  font-family: var(--font-editorial);
+  font-size: 1.35rem;
+  font-weight: 500;
+  color: var(--color-near-black);
+  letter-spacing: -0.01em;
+}
+
+.desktop-filter-close-btn {
+  background: transparent;
+  border: none;
+  color: var(--color-secondary-grey);
+  cursor: pointer;
+  padding: 6px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+  transition: all var(--transition-fast);
+}
+
+.desktop-filter-close-btn:hover {
+  background-color: var(--color-soft-cream);
+  color: var(--color-near-black);
+}
+
+.desktop-filter-grid {
+  display: grid;
+  grid-template-columns: 1.2fr 1.3fr 1.1fr;
+  gap: 2rem;
+  align-items: start;
+}
+
+.desktop-filter-col {
+  display: flex;
+  flex-direction: column;
+}
+
+.desktop-filter-col-title {
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-weight: 700;
+  color: var(--color-near-black);
+  margin-bottom: 0.85rem;
+}
+
+.desktop-filter-col-header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  margin-bottom: 0.85rem;
+}
+
+.desktop-filter-col-header .desktop-filter-col-title {
+  margin-bottom: 0;
+}
+
+.desktop-filter-price-value {
+  font-size: 0.86rem;
+  font-weight: 700;
+  color: var(--color-brand-red);
+}
+
+.desktop-pill-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+}
+
+.desktop-pill-group .filter-pill {
+  padding: 0.45rem 0.85rem;
+  font-size: 0.78rem;
+  border-radius: 9999px;
+  border: 1px solid var(--color-border);
+  background-color: #FFFFFF;
+  color: var(--color-near-black);
+  cursor: pointer;
+  font-weight: 500;
+  transition: all var(--transition-fast);
+}
+
+.desktop-pill-group .filter-pill:hover {
+  border-color: var(--color-near-black);
+  background-color: #FAF8F5;
+}
+
+.desktop-pill-group .filter-pill.active {
+  background-color: var(--color-near-black);
+  color: #FFFFFF;
+  border-color: var(--color-near-black);
+}
+
+/* Price Slider in Desktop Panel */
+.desktop-price-slider-box {
+  margin-top: 0.25rem;
+  margin-bottom: 0.95rem;
+}
+
+.desktop-price-slider {
+  width: 100%;
+  accent-color: var(--color-brand-red);
+  height: 6px;
+  cursor: pointer;
+  margin-bottom: 0.4rem;
+}
+
+.desktop-slider-labels {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.74rem;
+  color: var(--color-secondary-grey);
+}
+
+.desktop-price-presets {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin-top: 0.25rem;
+}
+
+.price-preset-pill {
+  padding: 0.35rem 0.65rem;
+  background-color: var(--color-soft-cream);
+  border: 1px solid var(--color-border);
+  border-radius: 4px;
+  font-size: 0.72rem;
+  font-weight: 500;
+  color: var(--color-near-black);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.price-preset-pill:hover {
+  background-color: #ECE5DC;
+  border-color: var(--color-near-black);
+}
+
+.price-preset-pill.active {
+  background-color: var(--color-brand-red);
+  color: #FFFFFF;
+  border-color: var(--color-brand-red);
+}
+
+.desktop-filter-hint {
+  font-size: 0.72rem;
+  color: var(--color-secondary-grey);
+  margin-top: 0.65rem;
+  line-height: 1.4;
+}
+
+/* Panel Footer */
+.desktop-filter-panel-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 1.5rem;
+  padding-top: 1.15rem;
+  border-top: 1px solid var(--color-border-subtle);
+}
+
+.desktop-draft-feedback {
+  font-size: 0.84rem;
+  color: var(--color-secondary-grey);
+}
+
+.desktop-draft-feedback strong {
+  color: var(--color-near-black);
+}
+
+.desktop-draft-active-hint {
+  font-size: 0.78rem;
+  color: var(--color-brand-red);
+  margin-left: 0.35rem;
+}
+
+.desktop-filter-footer-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.desktop-filter-clear-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.55rem 0.95rem;
+  background: transparent;
+  border: 1px solid var(--color-border);
+  border-radius: 4px;
+  font-size: 0.78rem;
+  font-weight: 500;
+  color: var(--color-secondary-grey);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.desktop-filter-clear-btn:hover:not(:disabled) {
+  background-color: #FEE2E2;
+  color: #B91C1C;
+  border-color: #FECACA;
+}
+
+.desktop-filter-clear-btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.desktop-filter-apply-btn {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.6rem 1.4rem;
+  background-color: var(--color-near-black);
+  border: 1px solid var(--color-near-black);
+  border-radius: 4px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: #FFFFFF;
+  cursor: pointer;
+  letter-spacing: 0.02em;
+  transition: all var(--transition-fast);
+}
+
+.desktop-filter-apply-btn:hover {
+  background-color: #333333;
+  border-color: #333333;
+}
+
+@media (max-width: 1024px) {
+  .desktop-filter-grid {
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .desktop-filter-panel,
+  .desktop-active-chips-bar {
+    display: none !important;
+  }
 }
 
 /* ===================================================================

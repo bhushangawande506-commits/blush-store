@@ -48,10 +48,13 @@ export const AboutSection = () => {
           <div>
             <div style={{ position: 'relative', borderRadius: '4px', overflow: 'hidden', boxShadow: 'var(--shadow-lg)' }}>
               <img
-                src="/images/Golden-Hour Mediterranean Terrace Portrait.png"
+                src="/images/Golden-Hour Mediterranean Terrace Portrait.webp"
                 alt="Blush Boutique Fashion Pune"
+                width="1672"
+                height="941"
                 style={{ width: '100%', height: 'auto', display: 'block' }}
                 loading="lazy"
+                decoding="async"
               />
               <div style={{ position: 'absolute', bottom: '16px', left: '16px', right: '16px', background: 'rgba(255, 255, 255, 0.92)', backdropFilter: 'blur(8px)', padding: '1rem', borderRadius: '4px', border: '1px solid rgba(23, 23, 23, 0.08)' }}>
                 <p style={{ fontSize: '0.75rem', fontWeight: '700', textTransform: 'uppercase', color: 'var(--color-brand-red)', marginBottom: '2px' }}>

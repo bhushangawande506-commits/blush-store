@@ -31,6 +31,9 @@ export const ProductCard = ({ product, onSelectProduct }) => {
           alt={product.name}
           className="product-card-img"
           loading="lazy"
+          decoding="async"
+          width="400"
+          height="533"
         />
 
         {/* Badges */}

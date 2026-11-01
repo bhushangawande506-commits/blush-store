@@ -1,6 +1,6 @@
-import React, { useState, useMemo, useEffect } from 'react';
+import React, { useState, useMemo, useEffect, useRef } from 'react';
 import { ProductCard } from './ProductCard';
-import { Search, SlidersHorizontal, RotateCcw, Sparkles, ArrowUpDown, X } from 'lucide-react';
+import { Search, SlidersHorizontal, RotateCcw, Sparkles, ArrowUpDown, X, ChevronDown, ChevronUp } from 'lucide-react';
 import { FilterBottomSheet } from './FilterBottomSheet';
 
 export const ProductGrid = ({
@@ -21,6 +21,103 @@ export const ProductGrid = ({
   const [maxPrice, setMaxPrice] = useState(6000);
   const [isFilterSheetOpen, setIsFilterSheetOpen] = useState(false);
   const [sheetInitialTab, setSheetInitialTab] = useState('filters');
+
+  // Desktop Filter Panel States & Ref
+  const [isDesktopFilterOpen, setIsDesktopFilterOpen] = useState(false);
+  const [draftCategory, setDraftCategory] = useState(selectedCategory);
+  const [draftSize, setDraftSize] = useState(selectedSize);
+  const [draftMaxPrice, setDraftMaxPrice] = useState(maxPrice);
+  const desktopFilterRef = useRef(null);
+
+  const pricePresets = [
+    { label: 'All (₹6,000)', value: 6000 },
+    { label: 'Under ₹3,500', value: 3500 },
+    { label: 'Under ₹2,500', value: 2500 }
+  ];
+
+  // Active filters count for desktop filter badge
+  const desktopActiveFilterCount =
+    (selectedCategory !== 'All' ? 1 : 0) +
+    (selectedSize !== 'ALL' ? 1 : 0) +
+    (maxPrice < 6000 ? 1 : 0);
+
+  // Sync draft states whenever desktop filter panel opens
+  useEffect(() => {
+    if (isDesktopFilterOpen) {
+      setDraftCategory(selectedCategory);
+      setDraftSize(selectedSize);
+      setDraftMaxPrice(maxPrice);
+    }
+  }, [isDesktopFilterOpen, selectedCategory, selectedSize, maxPrice]);
+
+  // Click outside and Escape key handler for desktop filter panel
+  useEffect(() => {
+    if (!isDesktopFilterOpen) return;
+
+    const handleKeyDown = (e) => {
+      if (e.key === 'Escape') {
+        setIsDesktopFilterOpen(false);
+      }
+    };
+
+    const handleClickOutside = (e) => {
+      if (
+        desktopFilterRef.current &&
+        !desktopFilterRef.current.contains(e.target) &&
+        !e.target.closest('#desktop-filter-toggle-btn')
+      ) {
+        setIsDesktopFilterOpen(false);
+      }
+    };
+
+    document.addEventListener('keydown', handleKeyDown);
+    document.addEventListener('mousedown', handleClickOutside);
+
+    return () => {
+      document.removeEventListener('keydown', handleKeyDown);
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [isDesktopFilterOpen]);
+
+  // Calculate live matching garments for desktop draft filters
+  const desktopDraftMatchingCount = useMemo(() => {
+    return products.filter((item) => {
+      if (filterMode === 'new_arrivals' && !item.is_new_arrival) return false;
+      if (filterMode === 'best_sellers' && !item.is_featured) return false;
+      if (draftCategory !== 'All' && item.category.toLowerCase() !== draftCategory.toLowerCase()) {
+        return false;
+      }
+      if (draftSize !== 'ALL' && !item.sizes?.includes(draftSize)) {
+        return false;
+      }
+      if (item.price > draftMaxPrice) {
+        return false;
+      }
+      if (searchQuery.trim()) {
+        const q = searchQuery.toLowerCase();
+        const matchName = item.name.toLowerCase().includes(q);
+        const matchDesc = item.description?.toLowerCase().includes(q);
+        const matchFab = item.fabric?.toLowerCase().includes(q);
+        if (!matchName && !matchDesc && !matchFab) return false;
+      }
+      return true;
+    }).length;
+  }, [products, filterMode, draftCategory, draftSize, draftMaxPrice, searchQuery]);
+
+  const handleApplyDesktopFilters = () => {
+    if (draftCategory !== selectedCategory) {
+      handleCategorySelect(draftCategory);
+    }
+    setSelectedSize(draftSize);
+    setMaxPrice(draftMaxPrice);
+    setIsDesktopFilterOpen(false);
+  };
+
+  const handleClearDesktopDrafts = () => {
+    setDraftCategory('All');
+    setDraftSize('ALL');
+    setDraftMaxPrice(6000);
+  };
 
   const openMobileFilters = () => {
     setSheetInitialTab('filters');
@@ -139,6 +236,13 @@ export const ProductGrid = ({
     filterMode !== 'all' ||
     (sortBy !== 'featured' && filterMode !== 'new_arrivals');
 
+  const hasActiveDesktopFilters =
+    selectedCategory !== 'All' ||
+    selectedSize !== 'ALL' ||
+    maxPrice < 6000 ||
+    searchQuery !== '' ||
+    filterMode !== 'all';
+
   // Dynamic heading & subtitle based on navigation filter
   let displayTitle = title;
   let displaySubtitle = subtitle;
@@ -163,91 +267,322 @@ export const ProductGrid = ({
           <p className="section-desc">{displaySubtitle}</p>
         </div>
 
-        {/* DESKTOP Controls Bar (Preserved exactly for desktop experience) */}
+        {/* DESKTOP Controls Bar */}
         <div className="shop-controls-bar shop-controls-bar-desktop" id="shop-controls-bar">
           {/* Search Input */}
           <div className="search-input-wrapper">
-            <Search size={16} />
+            <label htmlFor="catalogue-search-input" className="sr-only">
+              Search catalogue garments
+            </label>
+            <Search size={16} aria-hidden="true" />
             <input
               type="text"
               className="search-input"
               id="catalogue-search-input"
-              placeholder="Search dresses, tops, fabrics..."
+              placeholder="Search garments, fabrics..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
+              aria-label="Search catalogue garments"
             />
-          </div>
-
-          {/* Category Filter Pills (Full access to all categories) */}
-          <div className="category-filter-pills" id="category-filter-pills">
-            {categories.map((cat) => (
+            {searchQuery && (
               <button
-                key={cat}
-                className={`filter-pill ${selectedCategory === cat ? 'active' : ''}`}
-                id={`filter-category-${cat.toLowerCase().replace(/\s+/g, '-')}`}
-                onClick={() => handleCategorySelect(cat)}
+                type="button"
+                className="search-clear-inline-btn"
+                id="desktop-search-clear-btn"
+                onClick={() => setSearchQuery('')}
+                aria-label="Clear search input"
               >
-                {cat}
-              </button>
-            ))}
-          </div>
-
-          {/* Size Filter Pills */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <span style={{ fontSize: '0.78rem', color: 'var(--color-secondary-grey)' }}>Size:</span>
-            <div style={{ display: 'flex', gap: '4px' }}>
-              {sizes.map((sz) => (
-                <button
-                  key={sz}
-                  className={`filter-pill ${selectedSize === sz ? 'active' : ''}`}
-                  id={`filter-size-${sz.toLowerCase()}`}
-                  style={{ padding: '0.35rem 0.65rem', fontSize: '0.72rem' }}
-                  onClick={() => setSelectedSize(sz)}
-                >
-                  {sz}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          {/* Sort Selector */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-            <select
-              className="sort-select"
-              id="catalogue-sort-select"
-              value={sortBy}
-              onChange={(e) => setSortBy(e.target.value)}
-            >
-              <option value="featured">Sort: Featured First</option>
-              <option value="newest">Sort: Newest Arrivals</option>
-              <option value="price_asc">Price: Low to High</option>
-              <option value="price_desc">Price: High to Low</option>
-            </select>
-
-            {hasActiveFilters && (
-              <button
-                className="filter-pill"
-                id="clear-all-filters-btn"
-                onClick={resetFilters}
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '4px',
-                  backgroundColor: '#FEE2E2',
-                  color: '#B91C1C',
-                  borderColor: '#FECACA'
-                }}
-              >
-                <RotateCcw size={12} /> Clear Filters
+                <X size={14} />
               </button>
             )}
           </div>
+
+          {/* Desktop Right Controls: Filter Toggle Button + Sort Selector */}
+          <div className="desktop-controls-right">
+            <button
+              type="button"
+              className={`desktop-filter-btn ${isDesktopFilterOpen ? 'active' : ''} ${desktopActiveFilterCount > 0 ? 'has-active' : ''}`}
+              id="desktop-filter-toggle-btn"
+              onClick={() => setIsDesktopFilterOpen((prev) => !prev)}
+              aria-expanded={isDesktopFilterOpen}
+              aria-controls="desktop-filter-panel"
+              aria-label={`Filter boutique garments${desktopActiveFilterCount > 0 ? `, ${desktopActiveFilterCount} active` : ''}`}
+            >
+              <SlidersHorizontal size={15} />
+              <span>Filter</span>
+              {desktopActiveFilterCount > 0 && (
+                <span className="desktop-filter-badge" id="desktop-filter-badge-count">
+                  {desktopActiveFilterCount}
+                </span>
+              )}
+              {isDesktopFilterOpen ? <ChevronUp size={15} /> : <ChevronDown size={15} />}
+            </button>
+
+            <div className="desktop-sort-wrapper">
+              <label htmlFor="catalogue-sort-select" className="sr-only">
+                Sort boutique garments
+              </label>
+              <select
+                className="sort-select"
+                id="catalogue-sort-select"
+                value={sortBy}
+                onChange={(e) => setSortBy(e.target.value)}
+                aria-label="Sort boutique garments"
+              >
+                <option value="featured">Sort: Featured First</option>
+                <option value="newest">Sort: Newest Arrivals</option>
+                <option value="price_asc">Price: Low to High</option>
+                <option value="price_desc">Price: High to Low</option>
+              </select>
+            </div>
+          </div>
         </div>
+
+        {/* DESKTOP Active Filter Chips Bar */}
+        {hasActiveDesktopFilters && (
+          <div className="desktop-active-chips-bar" id="desktop-active-filter-chips">
+            <span className="active-chips-label">Active Filters:</span>
+            <div className="active-chips-list">
+              {selectedCategory !== 'All' && (
+                <span className="active-filter-chip" id="chip-active-category">
+                  Category: <strong>{selectedCategory}</strong>
+                  <button
+                    type="button"
+                    className="chip-remove-btn"
+                    id="chip-remove-category"
+                    onClick={() => handleCategorySelect('All')}
+                    aria-label={`Remove category filter ${selectedCategory}`}
+                  >
+                    <X size={12} />
+                  </button>
+                </span>
+              )}
+
+              {selectedSize !== 'ALL' && (
+                <span className="active-filter-chip" id="chip-active-size">
+                  Size: <strong>{selectedSize}</strong>
+                  <button
+                    type="button"
+                    className="chip-remove-btn"
+                    id="chip-remove-size"
+                    onClick={() => setSelectedSize('ALL')}
+                    aria-label={`Remove size filter ${selectedSize}`}
+                  >
+                    <X size={12} />
+                  </button>
+                </span>
+              )}
+
+              {maxPrice < 6000 && (
+                <span className="active-filter-chip" id="chip-active-price">
+                  Price: <strong>≤ ₹{maxPrice.toLocaleString('en-IN')}</strong>
+                  <button
+                    type="button"
+                    className="chip-remove-btn"
+                    id="chip-remove-price"
+                    onClick={() => setMaxPrice(6000)}
+                    aria-label="Remove price filter"
+                  >
+                    <X size={12} />
+                  </button>
+                </span>
+              )}
+
+              {searchQuery && (
+                <span className="active-filter-chip" id="chip-active-search">
+                  Search: <strong>"{searchQuery}"</strong>
+                  <button
+                    type="button"
+                    className="chip-remove-btn"
+                    id="chip-remove-search"
+                    onClick={() => setSearchQuery('')}
+                    aria-label="Remove search filter"
+                  >
+                    <X size={12} />
+                  </button>
+                </span>
+              )}
+
+              {filterMode !== 'all' && (
+                <span className="active-filter-chip active-filter-chip-mode" id="chip-active-mode">
+                  Collection: <strong>{filterMode === 'new_arrivals' ? 'New Arrivals' : 'Best Sellers'}</strong>
+                  <button
+                    type="button"
+                    className="chip-remove-btn"
+                    id="chip-remove-mode"
+                    onClick={() => {
+                      if (onClearFilterMode) onClearFilterMode();
+                    }}
+                    aria-label="Clear collection filter mode"
+                  >
+                    <X size={12} />
+                  </button>
+                </span>
+              )}
+
+              <button
+                type="button"
+                className="clear-all-chips-btn"
+                id="clear-all-filters-btn"
+                onClick={resetFilters}
+                aria-label="Clear all active filters"
+              >
+                <RotateCcw size={12} />
+                <span>Clear All</span>
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* DESKTOP Expandable Filter Panel */}
+        {isDesktopFilterOpen && (
+          <div
+            className="desktop-filter-panel"
+            id="desktop-filter-panel"
+            ref={desktopFilterRef}
+            role="region"
+            aria-label="Desktop filter options"
+          >
+            <div className="desktop-filter-panel-header">
+              <h3 className="desktop-filter-panel-title">Filter Boutique Collection</h3>
+              <button
+                type="button"
+                className="desktop-filter-close-btn"
+                id="desktop-filter-panel-close-btn"
+                onClick={() => setIsDesktopFilterOpen(false)}
+                aria-label="Close desktop filters"
+              >
+                <X size={18} />
+              </button>
+            </div>
+
+            <div className="desktop-filter-grid">
+              {/* Column 1: Category */}
+              <div className="desktop-filter-col">
+                <h4 className="desktop-filter-col-title">Category</h4>
+                <div className="desktop-pill-group" id="category-filter-pills">
+                  {categories.map((cat) => (
+                    <button
+                      key={cat}
+                      type="button"
+                      className={`filter-pill ${draftCategory === cat ? 'active' : ''}`}
+                      id={`filter-category-${cat.toLowerCase().replace(/\s+/g, '-')}`}
+                      onClick={() => setDraftCategory(cat)}
+                    >
+                      {cat}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Column 2: Price Range */}
+              <div className="desktop-filter-col">
+                <div className="desktop-filter-col-header">
+                  <h4 className="desktop-filter-col-title">Price Range</h4>
+                  <span className="desktop-filter-price-value">
+                    Up to ₹{draftMaxPrice.toLocaleString('en-IN')}
+                  </span>
+                </div>
+
+                <div className="desktop-price-slider-box">
+                  <input
+                    type="range"
+                    min="1000"
+                    max="6000"
+                    step="100"
+                    value={draftMaxPrice}
+                    onChange={(e) => setDraftMaxPrice(Number(e.target.value))}
+                    className="desktop-price-slider"
+                    id="desktop-price-range-slider"
+                    aria-label="Filter by maximum garment price"
+                  />
+                  <div className="desktop-slider-labels">
+                    <span>₹1,000</span>
+                    <span>₹6,000</span>
+                  </div>
+                </div>
+
+                <div className="desktop-price-presets">
+                  {pricePresets.map((preset) => (
+                    <button
+                      key={preset.value}
+                      type="button"
+                      className={`price-preset-pill ${draftMaxPrice === preset.value ? 'active' : ''}`}
+                      id={`desktop-price-preset-${preset.value}`}
+                      onClick={() => setDraftMaxPrice(preset.value)}
+                    >
+                      {preset.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Column 3: Garment Size */}
+              <div className="desktop-filter-col">
+                <h4 className="desktop-filter-col-title">Garment Size</h4>
+                <div className="desktop-pill-group" id="size-filter-pills">
+                  {sizes.map((sz) => (
+                    <button
+                      key={sz}
+                      type="button"
+                      className={`filter-pill ${draftSize === sz ? 'active' : ''}`}
+                      id={`filter-size-${sz.toLowerCase()}`}
+                      onClick={() => setDraftSize(sz)}
+                    >
+                      {sz}
+                    </button>
+                  ))}
+                </div>
+                <p className="desktop-filter-hint">
+                  Sizes reflect Pune boutique in-store & bespoke inventory.
+                </p>
+              </div>
+            </div>
+
+            {/* Panel Footer */}
+            <div className="desktop-filter-panel-footer">
+              <div className="desktop-draft-feedback">
+                <span>Matching: <strong>{desktopDraftMatchingCount}</strong> boutique garments</span>
+                {(draftCategory !== 'All' || draftSize !== 'ALL' || draftMaxPrice < 6000) && (
+                  <span className="desktop-draft-active-hint">
+                    • {draftCategory !== 'All' ? draftCategory : ''}
+                    {draftSize !== 'ALL' ? ` · Size ${draftSize}` : ''}
+                    {draftMaxPrice < 6000 ? ` · ≤₹${draftMaxPrice}` : ''}
+                  </span>
+                )}
+              </div>
+
+              <div className="desktop-filter-footer-actions">
+                <button
+                  type="button"
+                  className="desktop-filter-clear-btn"
+                  id="desktop-filter-clear-btn"
+                  onClick={handleClearDesktopDrafts}
+                  disabled={draftCategory === 'All' && draftSize === 'ALL' && draftMaxPrice === 6000}
+                >
+                  <RotateCcw size={13} />
+                  <span>Reset</span>
+                </button>
+                <button
+                  type="button"
+                  className="desktop-filter-apply-btn"
+                  id="desktop-filter-apply-btn"
+                  onClick={handleApplyDesktopFilters}
+                >
+                  Apply Filters ({desktopDraftMatchingCount})
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* MOBILE Compact Filter & Sort Bar (TASK 3) */}
         <div className="shop-controls-bar-mobile" id="mobile-shop-controls-bar">
           {/* Compact Mobile Search Input */}
           <div className="mobile-search-wrapper">
+            <label htmlFor="mobile-catalogue-search-input" className="sr-only">
+              Search boutique garments
+            </label>
             <Search size={16} className="mobile-search-icon" aria-hidden="true" />
             <input
               type="text"
@@ -256,7 +591,7 @@ export const ProductGrid = ({
               placeholder="Search garments, fabrics..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              aria-label="Search garments"
+              aria-label="Search boutique garments"
             />
             {searchQuery && (
               <button

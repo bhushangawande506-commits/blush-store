@@ -221,6 +221,11 @@ export const ProductDetailPage = ({
                 alt={product.name}
                 className="pdp-hero-image"
                 id="pdp-primary-image"
+                loading="eager"
+                fetchPriority="high"
+                decoding="async"
+                width="600"
+                height="800"
                 style={
                   isZoomed
                     ? {
@@ -256,9 +261,16 @@ export const ProductDetailPage = ({
                     type="button"
                     className={`pdp-thumb-button ${selectedImageIndex === idx ? 'active' : ''}`}
                     onClick={() => setSelectedImageIndex(idx)}
-                    aria-label={`View image ${idx + 1}`}
+                    aria-label={`View ${product.name} angle ${idx + 1}`}
                   >
-                    <img src={imgUrl} alt={`${product.name} angle ${idx + 1}`} />
+                    <img
+                      src={imgUrl}
+                      alt={`${product.name} angle ${idx + 1}`}
+                      loading="lazy"
+                      decoding="async"
+                      width="72"
+                      height="90"
+                    />
                   </button>
                 ))}
               </div>
@@ -480,16 +492,22 @@ export const ProductDetailPage = ({
               </div>
 
               <form onSubmit={handleCheckPincode} className="pdp-pincode-form">
+                <label htmlFor="pdp-pincode-input" className="sr-only">
+                  Delivery PIN Code
+                </label>
                 <input
                   type="text"
+                  inputMode="numeric"
+                  pattern="[0-9]*"
                   maxLength={6}
                   placeholder="Enter 6-digit PIN code"
                   className="pdp-pincode-input"
                   id="pdp-pincode-input"
                   value={pincode}
                   onChange={(e) => setPincode(e.target.value)}
+                  aria-label="Delivery PIN Code"
                 />
-                <button type="submit" className="pdp-pincode-submit" id="pdp-pincode-submit">
+                <button type="submit" className="pdp-pincode-submit" id="pdp-pincode-submit" aria-label="Check delivery PIN code">
                   Check
                 </button>
               </form>

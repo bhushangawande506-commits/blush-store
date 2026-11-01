@@ -239,6 +239,48 @@ export function App() {
       null
     : null;
 
+  // Dynamic Document Title and Canonical URL Handling (TASK 5)
+  useEffect(() => {
+    // 1. Manage single canonical link element
+    let canonicalLink = document.querySelector('link[rel="canonical"]');
+    if (!canonicalLink) {
+      canonicalLink = document.createElement('link');
+      canonicalLink.setAttribute('rel', 'canonical');
+      document.head.appendChild(canonicalLink);
+    }
+
+    const origin = window.location.origin;
+
+    // 2. Set document title and canonical URL based on view & active product
+    if (currentView === 'product' && currentActiveProduct) {
+      document.title = `${currentActiveProduct.name} — Blush Pune`;
+      const slug = currentActiveProduct.slug || currentActiveProduct.id;
+      canonicalLink.setAttribute('href', `${origin}/product/${slug}`);
+    } else if (currentView === 'shop') {
+      if (filterMode === 'new_arrivals') {
+        document.title = 'New Arrivals | Blush Pune';
+      } else if (filterMode === 'best_sellers') {
+        document.title = 'Best Sellers & Signature Edits | Blush Pune';
+      } else if (selectedCategory && selectedCategory !== 'All') {
+        document.title = `${selectedCategory} Collection | Blush Pune`;
+      } else {
+        document.title = 'Shop All Boutique Designs | Blush Pune';
+      }
+      // Canonical URL for shop strictly points to clean /shop without filter queries
+      canonicalLink.setAttribute('href', `${origin}/shop`);
+    } else if (currentView === 'wishlist') {
+      document.title = 'My Wishlist | Blush Pune';
+      canonicalLink.setAttribute('href', `${origin}/wishlist`);
+    } else if (currentView === 'about') {
+      document.title = 'About Our Boutique | Blush Pune';
+      canonicalLink.setAttribute('href', `${origin}/about`);
+    } else {
+      // Default home
+      document.title = "Blush — Contemporary Women's Fashion & Occasionwear | Pune";
+      canonicalLink.setAttribute('href', `${origin}/`);
+    }
+  }, [currentView, currentActiveProduct, filterMode, selectedCategory]);
+
   return (
     <div className="app-root">
       {/* 1. Continuous Announcement Bar Marquee */}
