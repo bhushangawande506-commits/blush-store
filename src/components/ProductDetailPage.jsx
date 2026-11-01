@@ -88,6 +88,14 @@ export const ProductDetailPage = ({
   const handleAddToCart = () => {
     if (!selectedSize) {
       showToast('Please choose your size');
+      const sizeSelector = document.getElementById('pdp-size-selector');
+      if (sizeSelector) {
+        sizeSelector.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        sizeSelector.classList.add('pdp-size-highlight');
+        setTimeout(() => {
+          sizeSelector.classList.remove('pdp-size-highlight');
+        }, 1800);
+      }
       return;
     }
     const success = addToCart(product, selectedSize, quantity);
@@ -362,7 +370,7 @@ export const ProductDetailPage = ({
                     type="button"
                     className={`pdp-size-pill ${selectedSize === sz ? 'active' : ''}`}
                     id={`pdp-size-btn-${sz}`}
-                    onClick={() => setSelectedSize(sz)}
+                    onClick={() => setSelectedSize(selectedSize === sz ? '' : sz)}
                   >
                     {sz}
                   </button>
@@ -626,6 +634,60 @@ export const ProductDetailPage = ({
             </div>
           </section>
         )}
+      </div>
+
+      {/* Mobile Sticky Add to Bag Bar (TASK 4) */}
+      <div
+        className="pdp-mobile-sticky-bar"
+        id="pdp-mobile-sticky-bar"
+        role="region"
+        aria-label="Quick Add to Bag"
+      >
+        <div className="pdp-sticky-bar-content">
+          <div
+            className="pdp-sticky-bar-info"
+            onClick={() => {
+              const sizeSelector = document.getElementById('pdp-size-selector');
+              if (sizeSelector) {
+                sizeSelector.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                sizeSelector.classList.add('pdp-size-highlight');
+                setTimeout(() => sizeSelector.classList.remove('pdp-size-highlight'), 1800);
+              }
+            }}
+            style={{ cursor: 'pointer' }}
+          >
+            <div className="pdp-sticky-price-row">
+              <span className="pdp-sticky-price" id="pdp-sticky-price">
+                ₹{product.price.toLocaleString('en-IN')}
+              </span>
+              {hasDiscount && (
+                <span className="pdp-sticky-compare">
+                  ₹{product.compare_at_price.toLocaleString('en-IN')}
+                </span>
+              )}
+            </div>
+            <div className="pdp-sticky-size-indicator" id="pdp-sticky-size-indicator">
+              {selectedSize ? (
+                <span>
+                  Size: <strong>{selectedSize}</strong> <span style={{ fontSize: '0.68rem', textDecoration: 'underline', marginLeft: '3px' }}>Change</span>
+                </span>
+              ) : (
+                <span className="pdp-sticky-no-size">Select Size</span>
+              )}
+            </div>
+          </div>
+
+          <button
+            type="button"
+            className="btn-primary pdp-sticky-add-btn"
+            id="pdp-sticky-add-to-bag-button"
+            onClick={handleAddToCart}
+            aria-label={`Add ${product.name} to Bag`}
+          >
+            <ShoppingBag size={16} />
+            <span>Add to Bag</span>
+          </button>
+        </div>
       </div>
     </div>
   );

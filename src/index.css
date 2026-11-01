@@ -3935,3 +3935,138 @@ img, video {
     padding: 0.8rem 0.4rem;
   }
 }
+
+/* ==========================================================================
+   MOBILE PRODUCT DETAIL PAGE UX (TASK 4)
+   ========================================================================== */
+
+/* Desktop: hide sticky add to bag bar */
+.pdp-mobile-sticky-bar {
+  display: none;
+}
+
+/* Touch devices & mobile: hide hover to zoom badge */
+@media (max-width: 768px), (hover: none), (pointer: coarse) {
+  .pdp-zoom-hint {
+    display: none !important;
+  }
+}
+
+/* Mobile Product Detail Page Sticky Bar */
+@media (max-width: 768px) {
+  .pdp-page-root {
+    padding-bottom: calc(76px + env(safe-area-inset-bottom, 0px));
+  }
+
+  .pdp-mobile-sticky-bar {
+    display: block;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 85;
+    background: #FFFFFF;
+    border-top: 1px solid var(--color-border);
+    box-shadow: 0 -4px 18px rgba(0, 0, 0, 0.08);
+    padding: 0.75rem 1rem;
+    padding-bottom: max(0.75rem, env(safe-area-inset-bottom));
+    animation: slideUpSticky 0.25s ease-out;
+  }
+
+  @keyframes slideUpSticky {
+    from {
+      transform: translateY(100%);
+    }
+    to {
+      transform: translateY(0);
+    }
+  }
+
+  .pdp-sticky-bar-content {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    max-width: 600px;
+    margin: 0 auto;
+  }
+
+  .pdp-sticky-bar-info {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+  }
+
+  .pdp-sticky-price-row {
+    display: flex;
+    align-items: baseline;
+    gap: 6px;
+  }
+
+  .pdp-sticky-price {
+    font-size: 1.18rem;
+    font-weight: 700;
+    color: var(--color-near-black);
+    line-height: 1.1;
+  }
+
+  .pdp-sticky-compare {
+    font-size: 0.8rem;
+    text-decoration: line-through;
+    color: var(--color-muted-grey);
+  }
+
+  .pdp-sticky-size-indicator {
+    font-size: 0.75rem;
+    color: var(--color-muted-grey);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .pdp-sticky-size-indicator strong {
+    color: var(--color-brand-red);
+    font-weight: 700;
+  }
+
+  .pdp-sticky-no-size {
+    color: var(--color-brand-red);
+    font-weight: 600;
+  }
+
+  .pdp-sticky-add-btn {
+    flex-shrink: 0;
+    padding: 0.75rem 1.4rem;
+    font-size: 0.85rem;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    border-radius: 4px;
+    white-space: nowrap;
+    min-height: 44px;
+    box-shadow: 0 2px 8px rgba(229, 9, 20, 0.2);
+  }
+
+  .pdp-size-highlight {
+    outline: 2px solid var(--color-brand-red);
+    border-radius: 6px;
+    transition: outline 0.2s ease;
+  }
+}
+
+@media (max-width: 380px) {
+  .pdp-sticky-bar-content {
+    gap: 0.5rem;
+  }
+
+  .pdp-sticky-price {
+    font-size: 1.05rem;
+  }
+
+  .pdp-sticky-add-btn {
+    padding: 0.7rem 1rem;
+    font-size: 0.8rem;
+  }
+}
