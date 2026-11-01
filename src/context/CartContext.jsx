@@ -17,8 +17,15 @@ export const CartProvider = ({ children }) => {
   const [wishlist, setWishlist] = useState(() => {
     try {
       const saved = localStorage.getItem('blush_wishlist');
-      return saved ? JSON.parse(saved) : [];
+      if (!saved) return [];
+      const parsed = JSON.parse(saved);
+      if (!Array.isArray(parsed)) return [];
+      // Clean and deduplicate IDs
+      return Array.from(new Set(parsed)).filter(
+        id => id !== null && id !== undefined && id !== ''
+      );
     } catch (e) {
+      console.error('Failed to parse blush_wishlist from localStorage', e);
       return [];
     }
   });
@@ -119,16 +126,53 @@ export const CartProvider = ({ children }) => {
     setCart([]);
   };
 
+  const isInWishlist = (productId) => {
+    if (productId === undefined || productId === null) return false;
+    return wishlist.some(id => String(id) === String(productId));
+  };
+
   const toggleWishlist = (productId) => {
+    if (productId === undefined || productId === null) return;
     setWishlist(prev => {
-      if (prev.includes(productId)) {
+      const exists = prev.some(id => String(id) === String(productId));
+      if (exists) {
         showToast('Removed from Wishlist');
-        return prev.filter(id => id !== productId);
+        return prev.filter(id => String(id) !== String(productId));
       } else {
         showToast('Saved to Wishlist');
         return [...prev, productId];
       }
     });
+  };
+
+  const removeFromWishlist = (productId) => {
+    if (productId === undefined || productId === null) return;
+    setWishlist(prev => {
+      const exists = prev.some(id => String(id) === String(productId));
+      if (exists) {
+        showToast('Removed from Wishlist');
+        return prev.filter(id => String(id) !== String(productId));
+      }
+      return prev;
+    });
+  };
+
+  const clearWishlist = () => {
+    setWishlist([]);
+    showToast('Wishlist cleared');
+  };
+
+  const moveToBag = (product, selectedSize, quantity = 1) => {
+    if (!selectedSize) {
+      showToast('Please choose your size first');
+      return false;
+    }
+    const success = addToCart(product, selectedSize, quantity);
+    if (success) {
+      removeFromWishlist(product.id);
+      showToast(`Moved to Bag: ${product.name} (${selectedSize})`);
+    }
+    return success;
   };
 
   // Calculations
@@ -157,7 +201,11 @@ export const CartProvider = ({ children }) => {
         toastMessage,
         showToast,
         wishlist,
-        toggleWishlist
+        isInWishlist,
+        toggleWishlist,
+        removeFromWishlist,
+        clearWishlist,
+        moveToBag
       }}
     >
       {children}

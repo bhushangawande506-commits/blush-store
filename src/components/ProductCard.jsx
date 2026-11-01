@@ -3,8 +3,8 @@ import { Heart } from 'lucide-react';
 import { useCart } from '../context/CartContext';
 
 export const ProductCard = ({ product, onSelectProduct }) => {
-  const { wishlist, toggleWishlist, addToCart } = useCart();
-  const isWishlisted = wishlist.includes(product.id);
+  const { wishlist, toggleWishlist, addToCart, isInWishlist } = useCart();
+  const isWishlisted = isInWishlist ? isInWishlist(product.id) : wishlist.some(id => String(id) === String(product.id));
 
   const mainImage = product.images?.[0] || '/images/hero/hero-poster.webp';
   const productUrl = `/product/${product.slug || product.id}`;

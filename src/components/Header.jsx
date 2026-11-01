@@ -31,6 +31,7 @@ export const Header = ({
   const isItemActive = (item) => {
     if (currentView === 'home' && item.id === 'home') return true;
     if (currentView === 'about' && item.id === 'about') return true;
+    if (currentView === 'wishlist' && item.id === 'wishlist') return true;
     if (currentView === 'shop') {
       if (filterMode === 'new_arrivals' && item.id === 'new-arrivals') return true;
       if (filterMode === 'best_sellers' && item.id === 'best-sellers') return true;
@@ -113,18 +114,19 @@ export const Header = ({
 
               {/* Wishlist Icon */}
               <button
-                className="action-btn"
+                className={`action-btn ${currentView === 'wishlist' ? 'active' : ''}`}
                 id="header-wishlist-btn"
                 onClick={() => {
-                  handleItemClick({ view: 'shop', category: 'All', filterMode: 'all', path: '/shop' });
-                  setTimeout(() => {
-                    window.scrollTo({ top: 400, behavior: 'smooth' });
-                  }, 100);
+                  handleItemClick({ view: 'wishlist', id: 'wishlist', path: '/wishlist' });
                 }}
                 title="Saved Wishlist"
-                aria-label="Wishlist"
+                aria-label={`Wishlist (${wishlist.length} saved)`}
               >
-                <Heart size={20} />
+                <Heart
+                  size={20}
+                  fill={currentView === 'wishlist' ? '#E50914' : 'none'}
+                  color={currentView === 'wishlist' ? '#E50914' : 'currentColor'}
+                />
                 {wishlist.length > 0 && (
                   <span className="badge-count" id="wishlist-badge-count">{wishlist.length}</span>
                 )}
@@ -223,6 +225,39 @@ export const Header = ({
                     </li>
                   );
                 })}
+
+                {/* Mobile Drawer Wishlist Direct Access */}
+                <li>
+                  <button
+                    id="mobile-nav-wishlist"
+                    onClick={() => handleItemClick({ view: 'wishlist', id: 'wishlist', path: '/wishlist' })}
+                    style={{
+                      fontFamily: 'var(--font-editorial)',
+                      fontSize: '1.45rem',
+                      fontWeight: currentView === 'wishlist' ? '600' : '400',
+                      color: currentView === 'wishlist' ? 'var(--color-brand-red)' : 'var(--color-near-black)',
+                      width: '100%',
+                      textAlign: 'left',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'space-between',
+                      padding: '0.25rem 0'
+                    }}
+                  >
+                    <span>My Wishlist</span>
+                    {wishlist.length > 0 ? (
+                      <span style={{ fontSize: '0.75rem', fontWeight: '700', color: 'var(--color-brand-red)', backgroundColor: 'var(--color-brand-red-subtle)', padding: '2px 8px', borderRadius: '10px' }}>
+                        {wishlist.length} saved
+                      </span>
+                    ) : (
+                      currentView === 'wishlist' && (
+                        <span style={{ fontSize: '0.7rem', textTransform: 'uppercase', color: 'var(--color-brand-red)', letterSpacing: '0.1em' }}>
+                          • Active
+                        </span>
+                      )
+                    )}
+                  </button>
+                </li>
               </ul>
 
               <div style={{ marginTop: 'auto', paddingTop: '2rem', borderTop: '1px solid var(--color-border)' }}>

@@ -16,6 +16,7 @@ import { SizeGuideModal } from './components/SizeGuideModal';
 import { PolicyModal } from './components/PolicyModal';
 import { AdminDashboard } from './components/AdminDashboard';
 import { Toast } from './components/Toast';
+import { WishlistPage } from './components/WishlistPage';
 import { PRODUCTS as FALLBACK_PRODUCTS } from './data/products';
 
 export function App() {
@@ -61,7 +62,17 @@ export function App() {
       };
     }
 
-    // 4. Check for /shop or query filters
+    // 4. Check for /wishlist
+    if (pathname === '/wishlist' || window.location.hash === '#wishlist' || window.location.hash === '#/wishlist') {
+      return {
+        view: 'wishlist',
+        productSlug: null,
+        category: 'All',
+        filterMode: 'all'
+      };
+    }
+
+    // 5. Check for /shop or query filters
     if (pathname === '/shop' || window.location.hash === '#shop' || filterParam || categoryParam) {
       let fMode = 'all';
       if (filterParam === 'new-arrivals' || filterParam === 'new') {
@@ -77,7 +88,7 @@ export function App() {
       };
     }
 
-    // 5. Default to home
+    // 6. Default to home
     return {
       view: 'home',
       productSlug: null,
@@ -177,6 +188,8 @@ export function App() {
       navigate('/');
     } else if (item.view === 'about') {
       navigate('/about');
+    } else if (item.view === 'wishlist') {
+      navigate('/wishlist');
     } else if (item.view === 'shop') {
       let query = '';
       if (item.filterMode === 'new_arrivals') query = '?filter=new-arrivals';
@@ -319,6 +332,15 @@ export function App() {
             <EditorialSection onExplore={handleShopNow} />
             <InstagramSection />
           </div>
+        )}
+
+        {/* VIEW 5: DEDICATED WISHLIST VIEW */}
+        {currentView === 'wishlist' && (
+          <WishlistPage
+            allProducts={products}
+            onSelectProduct={handleSelectProduct}
+            onContinueShopping={() => navigate('/shop')}
+          />
         )}
       </main>
 

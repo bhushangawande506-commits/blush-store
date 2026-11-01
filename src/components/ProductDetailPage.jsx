@@ -28,7 +28,7 @@ export const ProductDetailPage = ({
   onOpenPolicy,
   onBackToShop
 }) => {
-  const { addToCart, wishlist, toggleWishlist, showToast } = useCart();
+  const { addToCart, wishlist, toggleWishlist, showToast, isInWishlist } = useCart();
 
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
   const [selectedSize, setSelectedSize] = useState('');
@@ -67,7 +67,7 @@ export const ProductDetailPage = ({
     );
   }
 
-  const isWishlisted = wishlist.includes(product.id);
+  const isWishlisted = isInWishlist ? isInWishlist(product.id) : wishlist.some(id => String(id) === String(product.id));
   const images = product.images && product.images.length > 0 ? product.images : [BRAND_INFO.heroPoster];
   const activeImage = images[selectedImageIndex] || images[0];
 
