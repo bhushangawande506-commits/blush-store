@@ -45,10 +45,29 @@ export const HeroVideo = ({ onShopNow, onExplorePartywear }) => {
     };
   }, []);
 
-  const toggleSound = () => {
-    if (videoRef.current) {
-      videoRef.current.muted = !videoRef.current.muted;
-      setIsMuted(videoRef.current.muted);
+  const toggleSound = async () => {
+    const video = videoRef.current;
+    if (!video) return;
+
+    if (video.muted) {
+      try {
+        video.muted = false;
+        // In browsers with strict media policies, unmuting can pause media; ensure playback continues
+        const playPromise = video.play();
+        if (playPromise !== undefined) {
+          await playPromise;
+        }
+        setIsMuted(video.muted);
+      } catch (err) {
+        console.warn('Playback with audio prevented by browser policy:', err);
+        // Autoplay policy prevented unmuted playback: revert to muted so video continues uninterrupted
+        video.muted = true;
+        setIsMuted(true);
+        video.play().catch(() => {});
+      }
+    } else {
+      video.muted = true;
+      setIsMuted(true);
     }
   };
 
@@ -68,6 +87,11 @@ export const HeroVideo = ({ onShopNow, onExplorePartywear }) => {
           playsInline
           preload="metadata"
           onPlaying={() => setVideoPlaying(true)}
+          onVolumeChange={() => {
+            if (videoRef.current) {
+              setIsMuted(videoRef.current.muted);
+            }
+          }}
         >
           <source src={BRAND_INFO.heroVideo} type="video/mp4" />
           Your browser does not support HTML5 video playback.

@@ -410,6 +410,6 @@ export const BRAND_INFO = {
   instagram: "@blushpune",
   instagramUrl: "https://www.instagram.com/blushpune/",
   logo: "/images/brand/blush-logo.webp",
-  heroVideo: "/video/blush-hero-video.mp4",
+  heroVideo: "/video/blush-hero-new.mp4",
   heroPoster: "/images/hero/hero-poster.webp"
 };
