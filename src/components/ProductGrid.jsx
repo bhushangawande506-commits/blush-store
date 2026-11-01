@@ -1,6 +1,7 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import { ProductCard } from './ProductCard';
-import { Search, SlidersHorizontal, RotateCcw, Sparkles } from 'lucide-react';
+import { Search, SlidersHorizontal, RotateCcw, Sparkles, ArrowUpDown, X } from 'lucide-react';
+import { FilterBottomSheet } from './FilterBottomSheet';
 
 export const ProductGrid = ({
   products,
@@ -18,6 +19,41 @@ export const ProductGrid = ({
     filterMode === 'new_arrivals' ? 'newest' : 'featured'
   );
   const [maxPrice, setMaxPrice] = useState(6000);
+  const [isFilterSheetOpen, setIsFilterSheetOpen] = useState(false);
+  const [sheetInitialTab, setSheetInitialTab] = useState('filters');
+
+  const openMobileFilters = () => {
+    setSheetInitialTab('filters');
+    setIsFilterSheetOpen(true);
+  };
+
+  const openMobileSort = () => {
+    setSheetInitialTab('sort');
+    setIsFilterSheetOpen(true);
+  };
+
+  const activeMobileFilterCount =
+    (selectedCategory !== 'All' ? 1 : 0) +
+    (selectedSize !== 'ALL' ? 1 : 0) +
+    (maxPrice < 6000 ? 1 : 0);
+
+  const sortShortLabel = useMemo(() => {
+    switch (sortBy) {
+      case 'price_asc': return 'Price ↑';
+      case 'price_desc': return 'Price ↓';
+      case 'newest': return 'Newest';
+      default: return 'Featured';
+    }
+  }, [sortBy]);
+
+  const handleApplyMobileFilters = ({ category, size, maxPrice: newMaxPrice, sortBy: newSortBy }) => {
+    if (category !== selectedCategory) {
+      handleCategorySelect(category);
+    }
+    setSelectedSize(size);
+    setMaxPrice(newMaxPrice);
+    setSortBy(newSortBy);
+  };
 
   // Sync sortBy if filterMode changes
   useEffect(() => {
@@ -127,8 +163,8 @@ export const ProductGrid = ({
           <p className="section-desc">{displaySubtitle}</p>
         </div>
 
-        {/* Filters and Search Bar */}
-        <div className="shop-controls-bar" id="shop-controls-bar">
+        {/* DESKTOP Controls Bar (Preserved exactly for desktop experience) */}
+        <div className="shop-controls-bar shop-controls-bar-desktop" id="shop-controls-bar">
           {/* Search Input */}
           <div className="search-input-wrapper">
             <Search size={16} />
@@ -208,6 +244,78 @@ export const ProductGrid = ({
           </div>
         </div>
 
+        {/* MOBILE Compact Filter & Sort Bar (TASK 3) */}
+        <div className="shop-controls-bar-mobile" id="mobile-shop-controls-bar">
+          {/* Compact Mobile Search Input */}
+          <div className="mobile-search-wrapper">
+            <Search size={16} className="mobile-search-icon" aria-hidden="true" />
+            <input
+              type="text"
+              className="mobile-search-input"
+              id="mobile-catalogue-search-input"
+              placeholder="Search garments, fabrics..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              aria-label="Search garments"
+            />
+            {searchQuery && (
+              <button
+                type="button"
+                className="mobile-search-clear-btn"
+                id="mobile-search-clear-btn"
+                onClick={() => setSearchQuery('')}
+                aria-label="Clear search"
+              >
+                <X size={14} />
+              </button>
+            )}
+          </div>
+
+          {/* Action Row: Filter button, Sort button, Quick Reset */}
+          <div className="mobile-controls-action-row">
+            <button
+              type="button"
+              className={`mobile-action-pill ${activeMobileFilterCount > 0 ? 'active' : ''}`}
+              id="mobile-filter-open-btn"
+              onClick={openMobileFilters}
+              aria-label={`Open filters${activeMobileFilterCount > 0 ? `, ${activeMobileFilterCount} active` : ''}`}
+            >
+              <SlidersHorizontal size={15} />
+              <span>Filter</span>
+              {activeMobileFilterCount > 0 && (
+                <span className="mobile-pill-badge" id="mobile-filter-badge-count">
+                  {activeMobileFilterCount}
+                </span>
+              )}
+            </button>
+
+            <button
+              type="button"
+              className={`mobile-action-pill ${sortBy !== 'featured' ? 'active' : ''}`}
+              id="mobile-sort-open-btn"
+              onClick={openMobileSort}
+              aria-label={`Open sort options, currently ${sortShortLabel}`}
+            >
+              <ArrowUpDown size={15} />
+              <span>Sort: {sortShortLabel}</span>
+            </button>
+
+            {hasActiveFilters && (
+              <button
+                type="button"
+                className="mobile-action-pill mobile-reset-pill"
+                id="mobile-quick-clear-btn"
+                onClick={resetFilters}
+                title="Reset all filters"
+                aria-label="Reset all filters"
+              >
+                <RotateCcw size={13} />
+                <span>Reset</span>
+              </button>
+            )}
+          </div>
+        </div>
+
         {/* Results Counter */}
         <div
           style={{
@@ -269,6 +377,20 @@ export const ProductGrid = ({
           </div>
         )}
       </div>
+
+      {/* Mobile Filter & Sort Bottom Sheet (TASK 3) */}
+      <FilterBottomSheet
+        isOpen={isFilterSheetOpen}
+        onClose={() => setIsFilterSheetOpen(false)}
+        products={products}
+        filterMode={filterMode}
+        currentCategory={selectedCategory}
+        currentSize={selectedSize}
+        currentMaxPrice={maxPrice}
+        currentSortBy={sortBy}
+        initialTab={sheetInitialTab}
+        onApply={handleApplyMobileFilters}
+      />
     </section>
   );
 };
