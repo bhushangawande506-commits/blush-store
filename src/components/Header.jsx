@@ -258,6 +258,34 @@ export const Header = ({
                     )}
                   </button>
                 </li>
+
+                {/* Mobile Drawer Search Direct Trigger */}
+                <li>
+                  <button
+                    id="mobile-nav-search"
+                    onClick={() => {
+                      setMobileMenuOpen(false);
+                      onOpenSearch();
+                    }}
+                    style={{
+                      fontFamily: 'var(--font-editorial)',
+                      fontSize: '1.45rem',
+                      fontWeight: '400',
+                      color: 'var(--color-near-black)',
+                      width: '100%',
+                      textAlign: 'left',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'space-between',
+                      padding: '0.25rem 0'
+                    }}
+                  >
+                    <span style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                      <Search size={20} />
+                      Search Store
+                    </span>
+                  </button>
+                </li>
               </ul>
 
               <div style={{ marginTop: 'auto', paddingTop: '2rem', borderTop: '1px solid var(--color-border)' }}>

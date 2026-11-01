@@ -17,6 +17,7 @@ import { PolicyModal } from './components/PolicyModal';
 import { AdminDashboard } from './components/AdminDashboard';
 import { Toast } from './components/Toast';
 import { WishlistPage } from './components/WishlistPage';
+import { SearchModal } from './components/SearchModal';
 import { PRODUCTS as FALLBACK_PRODUCTS } from './data/products';
 
 export function App() {
@@ -110,6 +111,7 @@ export function App() {
   const [isSizeGuideOpen, setIsSizeGuideOpen] = useState(false);
   const [activePolicy, setActivePolicy] = useState(null);
   const [isAdminOpen, setIsAdminOpen] = useState(false);
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
 
   // Listen for browser Back/Forward (popstate)
   useEffect(() => {
@@ -217,13 +219,7 @@ export function App() {
   };
 
   const handleOpenSearch = () => {
-    if (currentView !== 'shop') {
-      navigate('/shop');
-    }
-    setTimeout(() => {
-      const searchInput = document.getElementById('catalogue-search-input');
-      if (searchInput) searchInput.focus();
-    }, 250);
+    setIsSearchOpen(true);
   };
 
   // Product Selection: navigate directly to dedicated product page
@@ -389,6 +385,22 @@ export function App() {
         <PolicyModal
           policyType={activePolicy}
           onClose={() => setActivePolicy(null)}
+        />
+      )}
+
+      {/* Search Overlay Modal */}
+      {isSearchOpen && (
+        <SearchModal
+          allProducts={products}
+          onClose={() => setIsSearchOpen(false)}
+          onSelectProduct={(product) => {
+            setIsSearchOpen(false);
+            handleSelectProduct(product);
+          }}
+          onSelectCategory={(catName) => {
+            setIsSearchOpen(false);
+            handleSelectCategory(catName);
+          }}
         />
       )}
 
