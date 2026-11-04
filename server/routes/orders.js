@@ -1,97 +1,137 @@
 const express = require('express');
 const router = express.Router();
-const { db } = require('../db');
+const { query, transaction } = require('../db');
 
-// Create a new order (authoritative server validation)
-router.post('/create', (req, res) => {
-  const {
-    customer_name,
-    customer_email,
-    customer_phone,
-    shipping_address,
-    city,
-    state,
-    pincode,
-    order_notes,
-    items,
-    payment_method = 'razorpay'
-  } = req.body;
-
-  // Validation
-  if (!customer_name || !customer_email || !customer_phone || !shipping_address || !city || !state || !pincode) {
-    return res.status(400).json({ error: 'Please provide all required shipping and contact details.' });
+/**
+ * Safely extracts the primary image URL from a product database record.
+ * Handles both pre-parsed JSONB arrays (pg driver) and stringified JSON.
+ */
+function getProductPrimaryImage(dbProd, fallbackImage) {
+  if (fallbackImage && typeof fallbackImage === 'string' && fallbackImage.trim()) {
+    return fallbackImage.trim();
   }
-
-  if (!items || !Array.isArray(items) || items.length === 0) {
-    return res.status(400).json({ error: 'Order must contain at least one item.' });
+  const images = dbProd.images;
+  if (Array.isArray(images) && images.length > 0) {
+    return images[0];
   }
+  if (typeof images === 'string') {
+    try {
+      const parsed = JSON.parse(images);
+      if (Array.isArray(parsed) && parsed.length > 0) return parsed[0];
+    } catch {}
+  }
+  return '';
+}
 
-  // Fetch products from database to verify stock and compute true price
-  const productIds = items.map(i => i.product_id || i.id);
-  const placeholders = productIds.map(() => '?').join(',');
+// POST /create: Create a new order with authoritative server-side validation & atomic transaction
+router.post('/create', async (req, res) => {
+  try {
+    const {
+      customer_name,
+      customer_email,
+      customer_phone,
+      shipping_address,
+      city,
+      state,
+      pincode,
+      order_notes,
+      items,
+      payment_method = 'razorpay'
+    } = req.body;
 
-  db.all(`SELECT * FROM products WHERE id IN (${placeholders})`, productIds, (err, dbProducts) => {
-    if (err) {
-      console.error('Error querying products for order:', err);
-      return res.status(500).json({ error: 'Database error validating products' });
+    // 1. Contact & Shipping Field Validation
+    if (!customer_name || !customer_email || !customer_phone || !shipping_address || !city || !state || !pincode) {
+      return res.status(400).json({ error: 'Please provide all required shipping and contact details.' });
     }
 
-    const productMap = new Map();
-    dbProducts.forEach(p => productMap.set(p.id, p));
+    if (!items || !Array.isArray(items) || items.length === 0) {
+      return res.status(400).json({ error: 'Order must contain at least one item.' });
+    }
 
-    // Calculate authoritative totals and check inventory
+    // 2. Validate Item Structure, Product IDs, and Quantities (prevent invalid inputs)
+    const productIds = [];
+    for (const item of items) {
+      const rawId = item.product_id || item.id;
+      const numId = Number(rawId);
+      if (!rawId || isNaN(numId) || !Number.isInteger(numId) || numId <= 0) {
+        return res.status(400).json({ error: `Invalid product ID: ${rawId}` });
+      }
+
+      const qty = parseInt(item.quantity, 10);
+      if (isNaN(qty) || qty <= 0) {
+        return res.status(400).json({
+          error: `Invalid quantity for product ID ${rawId}: must be a positive integer.`
+        });
+      }
+      productIds.push(numId);
+    }
+
+    // 3. Fetch Products Authoritatively from PostgreSQL using Parameterized Query
+    const uniqueIds = Array.from(new Set(productIds));
+    const placeholders = uniqueIds.map((_, idx) => `$${idx + 1}`).join(', ');
+    const dbProductsRes = await query(
+      `SELECT id, name, price, stock, images FROM products WHERE id IN (${placeholders})`,
+      uniqueIds
+    );
+    const dbProducts = dbProductsRes.rows || [];
+
+    const productMap = new Map();
+    dbProducts.forEach(p => productMap.set(Number(p.id), p));
+
+    // 4. Authoritative Pricing Calculation & Inventory Validation
+    // Never trust frontend-submitted prices or totals!
     let serverSubtotal = 0;
     const validatedItems = [];
 
     for (const item of items) {
-      const pid = item.product_id || item.id;
+      const pid = Number(item.product_id || item.id);
       const dbProd = productMap.get(pid);
 
       if (!dbProd) {
         return res.status(400).json({ error: `Product with ID ${pid} is not found.` });
       }
 
-      const qty = parseInt(item.quantity, 10) || 1;
-      if (dbProd.stock < qty) {
+      const qty = parseInt(item.quantity, 10);
+      if (Number(dbProd.stock) < qty) {
         return res.status(400).json({
           error: `Insufficient stock for "${dbProd.name}". Available: ${dbProd.stock}, Requested: ${qty}`
         });
       }
 
-      const itemTotal = dbProd.price * qty;
-      serverSubtotal += itemTotal;
+      const itemPrice = Number(dbProd.price);
+      serverSubtotal += itemPrice * qty;
 
       validatedItems.push({
-        product_id: dbProd.id,
+        product_id: Number(dbProd.id),
         product_name: dbProd.name,
         size: item.size || 'Regular',
         color: item.color || '',
-        price: dbProd.price,
+        price: itemPrice,
         quantity: qty,
-        image: item.image || (JSON.parse(dbProd.images || '[]')[0] || '')
+        image: getProductPrimaryImage(dbProd, item.image)
       });
     }
 
-    // Shipping rules: Free shipping for orders >= ₹2,499, otherwise standard ₹150
+    // 5. Authoritative Shipping Rules
+    // Free shipping for orders >= ₹2,499, otherwise standard ₹150
     const shippingFee = serverSubtotal >= 2499 ? 0 : 150;
     const discount = 0;
     const totalAmount = serverSubtotal + shippingFee - discount;
 
     const orderId = `BLUSH-${Date.now().toString().slice(-6)}`;
 
-    // Insert order and order items
-    db.serialize(() => {
-      db.run('BEGIN TRANSACTION');
-
-      const insertOrder = db.prepare(`
+    // 6. Atomic Transaction via Dedicated Client (orders + order_items)
+    await transaction(async (client) => {
+      // Insert master order record
+      await client.query(`
         INSERT INTO orders (
           id, customer_name, customer_email, customer_phone, shipping_address,
           city, state, pincode, order_notes, subtotal, shipping_fee, discount,
           total_amount, payment_method, payment_status, order_status
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'pending', 'pending_payment')
-      `);
-
-      insertOrder.run(
+        ) VALUES (
+          $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, 'pending', 'pending_payment'
+        )
+      `, [
         orderId,
         customer_name.trim(),
         customer_email.trim(),
@@ -105,79 +145,87 @@ router.post('/create', (req, res) => {
         shippingFee,
         discount,
         totalAmount,
-        payment_method,
-        function (insErr) {
-          if (insErr) {
-            db.run('ROLLBACK');
-            console.error('Failed to create order record:', insErr);
-            return res.status(500).json({ error: 'Failed to record order' });
-          }
+        payment_method
+      ]);
 
-          const insertItem = db.prepare(`
-            INSERT INTO order_items (
-              order_id, product_id, product_name, size, color, price, quantity, image
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-          `);
-
-          validatedItems.forEach(v => {
-            insertItem.run(orderId, v.product_id, v.product_name, v.size, v.color, v.price, v.quantity, v.image);
-          });
-
-          insertItem.finalize((itemErr) => {
-            if (itemErr) {
-              db.run('ROLLBACK');
-              console.error('Failed to insert order items:', itemErr);
-              return res.status(500).json({ error: 'Failed to record order items' });
-            }
-
-            db.run('COMMIT');
-
-            res.json({
-              success: true,
-              orderId,
-              subtotal: serverSubtotal,
-              shippingFee,
-              discount,
-              totalAmount,
-              currency: 'INR',
-              customer: {
-                name: customer_name,
-                email: customer_email,
-                phone: customer_phone
-              },
-              items: validatedItems
-            });
-          });
-        }
-      );
+      // Insert line items
+      for (const v of validatedItems) {
+        await client.query(`
+          INSERT INTO order_items (
+            order_id, product_id, product_name, size, color, price, quantity, image
+          ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+        `, [
+          orderId,
+          v.product_id,
+          v.product_name,
+          v.size,
+          v.color,
+          v.price,
+          v.quantity,
+          v.image
+        ]);
+      }
     });
-  });
+
+    // 7. Successful Response Matching Exact API Contract
+    return res.json({
+      success: true,
+      orderId,
+      subtotal: serverSubtotal,
+      shippingFee,
+      discount,
+      totalAmount,
+      currency: 'INR',
+      customer: {
+        name: customer_name,
+        email: customer_email,
+        phone: customer_phone
+      },
+      items: validatedItems
+    });
+  } catch (err) {
+    console.error('Failed to create order record:', err);
+    return res.status(500).json({ error: 'Failed to record order' });
+  }
 });
 
-// GET single order details
-router.get('/:id', (req, res) => {
-  const { id } = req.params;
-
-  db.get('SELECT * FROM orders WHERE id = ?', [id], (err, order) => {
-    if (err) {
-      return res.status(500).json({ error: 'Error fetching order' });
-    }
-    if (!order) {
+// GET /:id: Retrieve single order details and its line items
+router.get('/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    if (!id || typeof id !== 'string') {
       return res.status(404).json({ error: 'Order not found' });
     }
 
-    db.all('SELECT * FROM order_items WHERE order_id = ?', [id], (iErr, items) => {
-      if (iErr) {
-        return res.status(500).json({ error: 'Error fetching order items' });
-      }
+    const orderRes = await query('SELECT * FROM orders WHERE id = $1', [id.trim()]);
+    if (!orderRes.rows || orderRes.rows.length === 0) {
+      return res.status(404).json({ error: 'Order not found' });
+    }
 
-      res.json({
-        success: true,
-        order,
-        items
-      });
+    const order = orderRes.rows[0];
+
+    const itemsRes = await query(
+      'SELECT * FROM order_items WHERE order_id = $1 ORDER BY id ASC',
+      [order.id]
+    );
+
+    const items = (itemsRes.rows || []).map(item => ({
+      ...item,
+      id: Number(item.id),
+      product_id: item.product_id ? Number(item.product_id) : null,
+      price: Number(item.price),
+      quantity: Number(item.quantity)
+    }));
+
+    return res.json({
+      success: true,
+      order,
+      items
     });
-  });
+  } catch (err) {
+    console.error('Error fetching order:', err);
+    return res.status(500).json({ error: 'Error fetching order' });
+  }
 });
 
 module.exports = router;

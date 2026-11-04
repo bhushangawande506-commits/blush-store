@@ -2,7 +2,7 @@ require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const path = require('path');
-const { initDatabase } = require('./db');
+const { initDatabase, checkDatabaseHealth } = require('./db');
 
 const productsRouter = require('./routes/products');
 const ordersRouter = require('./routes/orders');
@@ -41,13 +41,21 @@ app.use('/api/orders', ordersRouter);
 app.use('/api/payment', paymentRouter);
 app.use('/api/admin', adminRouter);
 
-// Health check endpoint
-app.get('/api/health', (req, res) => {
-  res.json({
-    status: 'healthy',
+// Health check endpoint with live Supabase PostgreSQL connectivity verification
+app.get('/api/health', async (req, res) => {
+  const dbHealth = await checkDatabaseHealth();
+  const isHealthy = dbHealth.status === 'healthy';
+  res.status(isHealthy ? 200 : 503).json({
+    status: isHealthy ? 'healthy' : 'degraded',
     brand: 'Blush',
     location: 'Pune, Maharashtra, India',
     established: 2014,
+    database: {
+      type: 'Supabase PostgreSQL',
+      status: dbHealth.status,
+      database: dbHealth.database,
+      latency: dbHealth.latencyMs ? `${dbHealth.latencyMs}ms` : undefined
+    },
     timestamp: new Date().toISOString()
   });
 });
