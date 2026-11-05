@@ -55,11 +55,15 @@ if (process.env.SUPABASE_SSL_CA) {
 }
 
 // 3. PostgreSQL Connection Pool
+const isServerless = Boolean(process.env.VERCEL || process.env.AWS_LAMBDA_FUNCTION_NAME);
+const defaultPoolMax = isServerless ? 1 : 10;
+const defaultIdleTimeout = isServerless ? 5000 : 30000;
+
 const pool = new Pool({
   connectionString: connectionString || undefined,
   ssl: sslConfig,
-  max: parseInt(process.env.DB_POOL_MAX || '10', 10),
-  idleTimeoutMillis: parseInt(process.env.DB_IDLE_TIMEOUT || '30000', 10),
+  max: parseInt(process.env.DB_POOL_MAX || String(defaultPoolMax), 10),
+  idleTimeoutMillis: parseInt(process.env.DB_IDLE_TIMEOUT || String(defaultIdleTimeout), 10),
   connectionTimeoutMillis: parseInt(process.env.DB_CONNECT_TIMEOUT || '10000', 10)
 });
 
@@ -135,23 +139,35 @@ async function checkDatabaseHealth() {
 }
 
 // 6. Database Initialization Lifecycle Handler
+let initPromise = null;
+
 /**
- * Invoked during Express startup (server/server.js).
+ * Invoked during Express startup and serverless request lifecycle.
  * Validates connection, verifies SSL, and logs connectivity info without leaking secrets.
+ * Caches the initialization promise safely across warm invocations.
  */
 async function initDatabase() {
-  const health = await checkDatabaseHealth();
-  if (health.status !== 'healthy') {
-    throw new Error(`Supabase PostgreSQL connection failed: ${health.error}`);
+  if (!initPromise) {
+    initPromise = (async () => {
+      const health = await checkDatabaseHealth();
+      if (health.status !== 'healthy') {
+        throw new Error(`Supabase PostgreSQL connection failed: ${health.error}`);
+      }
+
+      console.log(`✓ Connected to Supabase PostgreSQL [${health.endpoint}]`);
+      console.log(`  - Database   : ${health.database} (${health.version})`);
+      console.log(`  - Server Time: ${health.serverTime}`);
+      console.log(`  - SSL Verify : ACTIVE (rejectUnauthorized: ${health.sslVerified})`);
+      console.log(`  - Latency    : ${health.latencyMs}ms`);
+
+      return health;
+    })().catch(err => {
+      initPromise = null; // Reset cache on failure so subsequent attempts can retry
+      throw err;
+    });
   }
 
-  console.log(`✓ Connected to Supabase PostgreSQL [${health.endpoint}]`);
-  console.log(`  - Database   : ${health.database} (${health.version})`);
-  console.log(`  - Server Time: ${health.serverTime}`);
-  console.log(`  - SSL Verify : ACTIVE (rejectUnauthorized: ${health.sslVerified})`);
-  console.log(`  - Latency    : ${health.latencyMs}ms`);
-
-  return health;
+  return initPromise;
 }
 
 // 7. Parameterized Query Helper

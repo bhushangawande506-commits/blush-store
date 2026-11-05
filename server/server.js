@@ -35,6 +35,23 @@ app.use(express.static(publicDir));
 app.use('/images', express.static(path.join(publicDir, 'images')));
 app.use('/video', express.static(path.join(publicDir, 'video')));
 
+// Ensure database initialization completes before executing API handlers (serverless & continuous)
+app.use(async (req, res, next) => {
+  if (req.path.startsWith('/images') || req.path.startsWith('/video')) {
+    return next();
+  }
+  try {
+    await initDatabase();
+    next();
+  } catch (err) {
+    console.error('[Database Init Middleware Error]', err.message);
+    res.status(503).json({
+      error: 'Database connection unavailable',
+      details: err.message
+    });
+  }
+});
+
 // API Routes
 app.use('/api/products', productsRouter);
 app.use('/api/orders', ordersRouter);
@@ -66,16 +83,20 @@ app.use((err, req, res, next) => {
   res.status(500).json({ error: 'Internal Server Error', message: err.message });
 });
 
-// Initialize database and start server
-initDatabase().then(() => {
-  app.listen(PORT, () => {
-    console.log(`===============================================`);
-    console.log(` ✨ Blush Fashion E-Commerce Server`);
-    console.log(` 📍 Location: Pune, Maharashtra, India (Est. 2014)`);
-    console.log(` 🚀 Server listening on: http://localhost:${PORT}`);
-    console.log(` 🛍️  API Endpoints ready at http://localhost:${PORT}/api/`);
-    console.log(`===============================================`);
+// Dual-mode execution: listen when run directly via CLI, export app when required by serverless
+if (require.main === module) {
+  initDatabase().then(() => {
+    app.listen(PORT, () => {
+      console.log(`===============================================`);
+      console.log(` ✨ Blush Fashion E-Commerce Server`);
+      console.log(` 📍 Location: Pune, Maharashtra, India (Est. 2014)`);
+      console.log(` 🚀 Server listening on: http://localhost:${PORT}`);
+      console.log(` 🛍️  API Endpoints ready at http://localhost:${PORT}/api/`);
+      console.log(`===============================================`);
+    });
+  }).catch(err => {
+    console.error('Failed to initialize database on startup:', err);
   });
-}).catch(err => {
-  console.error('Failed to initialize database on startup:', err);
-});
+}
+
+module.exports = app;
