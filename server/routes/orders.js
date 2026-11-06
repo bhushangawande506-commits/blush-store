@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const { query, transaction } = require('../db');
+const { sendOrderConfirmationEmail } = require('../email');
 
 /**
  * Safely extracts the primary image URL from a product database record.
@@ -167,7 +168,26 @@ router.post('/create', async (req, res) => {
       }
     });
 
-    // 7. Successful Response Matching Exact API Contract
+    // 7. Non-blocking order confirmation email dispatch via Resend
+    // Order is already committed authoritatively. Email failure must never block or cancel the order.
+    sendOrderConfirmationEmail({
+      orderId,
+      customerEmail: customer_email.trim(),
+      customerName: customer_name.trim(),
+      items: validatedItems,
+      subtotal: serverSubtotal,
+      shippingFee,
+      discount,
+      totalAmount,
+      shippingAddress: shipping_address.trim(),
+      city: city.trim(),
+      state: state.trim(),
+      pincode: pincode.trim()
+    }).catch(err => {
+      console.error(`[Email Warning] Background email error for order ${orderId}:`, err.message);
+    });
+
+    // 8. Successful Response Matching Exact API Contract
     return res.json({
       success: true,
       orderId,
