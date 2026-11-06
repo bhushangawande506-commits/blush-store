@@ -19,9 +19,24 @@ app.use(cors({
   allowedHeaders: ['Content-Type', 'Authorization', 'x-admin-token', 'x-razorpay-signature']
 }));
 
+// Normalize req.url if rewritten by Vercel serverless proxy
+app.use((req, res, next) => {
+  if (req.url === '/api' || req.url === '/api/index.js' || req.url === '/api/' || req.url === '/') {
+    const rawPath = req.headers['x-matched-path'] || req.headers['x-forwarded-uri'] || req.headers['x-original-url'];
+    if (rawPath && rawPath.startsWith('/api')) {
+      if (!rawPath.includes('?') && req.url.includes('?')) {
+        req.url = rawPath + '?' + req.url.split('?')[1];
+      } else {
+        req.url = rawPath;
+      }
+    }
+  }
+  next();
+});
+
 // Body parser (except raw webhook route which parses inside paymentRouter)
 app.use((req, res, next) => {
-  if (req.originalUrl === '/api/payment/webhook') {
+  if (req.originalUrl === '/api/payment/webhook' || req.url === '/api/payment/webhook') {
     next();
   } else {
     express.json({ limit: '10mb' })(req, res, next);
