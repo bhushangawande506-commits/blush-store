@@ -1775,6 +1775,49 @@ img, video {
   color: var(--color-brand-red);
 }
 
+/* Footer Concierge Action Buttons */
+.footer-concierge-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  width: 100%;
+  max-width: 230px;
+  box-sizing: border-box;
+  padding: 0.72rem 1.15rem;
+  font-size: 0.82rem;
+  font-weight: 600;
+  border-radius: 4px;
+  line-height: 1.2;
+  text-decoration: none;
+  cursor: pointer;
+  letter-spacing: 0.02em;
+  transition: all var(--transition-fast, 0.2s ease);
+}
+
+.footer-concierge-btn.btn-whatsapp {
+  background-color: #25D366;
+  color: #ffffff;
+  border: 1px solid transparent;
+}
+
+.footer-concierge-btn.btn-whatsapp:hover {
+  background-color: #1EBE5D;
+  box-shadow: 0 4px 14px rgba(37, 211, 102, 0.3);
+}
+
+.btn-enquiry-secondary {
+  background-color: rgba(255, 255, 255, 0.05);
+  color: rgba(255, 255, 255, 0.9);
+  border: 1px solid rgba(255, 255, 255, 0.22);
+}
+
+.btn-enquiry-secondary:hover {
+  background-color: rgba(255, 255, 255, 0.12);
+  color: #ffffff;
+  border-color: rgba(255, 255, 255, 0.45);
+}
+
 .footer-bottom {
   padding-top: 2rem;
   display: flex;

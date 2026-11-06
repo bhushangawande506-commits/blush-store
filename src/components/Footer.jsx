@@ -1,6 +1,6 @@
 import React from 'react';
 import { BRAND_INFO, CATEGORIES } from '../data/products';
-import { Phone, MapPin, MessageCircle, ShieldCheck } from 'lucide-react';
+import { Phone, MapPin, MessageCircle, ShieldCheck, MessageSquareQuote } from 'lucide-react';
 
 const InstagramIcon = ({ size = 16 }) => (
   <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -10,7 +10,7 @@ const InstagramIcon = ({ size = 16 }) => (
   </svg>
 );
 
-export const Footer = ({ onSelectCategory, onOpenPolicy }) => {
+export const Footer = ({ onSelectCategory, onOpenPolicy, onOpenEnquiry }) => {
   return (
     <footer className="footer" id="main-footer">
       <div className="container">
@@ -108,6 +108,15 @@ export const Footer = ({ onSelectCategory, onOpenPolicy }) => {
               <li>
                 <button
                   className="footer-link"
+                  id="footer-customer-enquiry"
+                  onClick={onOpenEnquiry}
+                >
+                  Customer Enquiry
+                </button>
+              </li>
+              <li>
+                <button
+                  className="footer-link"
                   id="footer-policy-faq"
                   onClick={() => onOpenPolicy('faq')}
                 >
@@ -142,16 +151,27 @@ export const Footer = ({ onSelectCategory, onOpenPolicy }) => {
               Prefer to order via WhatsApp or discuss custom sizing? Our boutique stylists are at your service.
             </p>
 
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.85rem' }}>
               <a
                 href={`${BRAND_INFO.whatsappUrl}?text=${encodeURIComponent("Hello Blush, I would like to place an order.")}`}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="btn-whatsapp"
-                style={{ fontSize: '0.8rem', padding: '0.65rem 1rem', width: 'fit-content' }}
+                className="btn-whatsapp footer-concierge-btn"
+                id="footer-whatsapp-order-btn"
               >
-                <MessageCircle size={15} /> Order on WhatsApp
+                <MessageCircle size={15} />
+                <span>Order on WhatsApp</span>
               </a>
+
+              <button
+                type="button"
+                className="btn-enquiry-secondary footer-concierge-btn"
+                id="footer-concierge-enquiry-btn"
+                onClick={onOpenEnquiry}
+              >
+                <MessageSquareQuote size={15} />
+                <span>Submit Customer Enquiry</span>
+              </button>
 
               <a
                 href={BRAND_INFO.instagramUrl}
