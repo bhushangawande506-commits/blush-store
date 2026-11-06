@@ -11,6 +11,15 @@ const InstagramIcon = ({ size = 16 }) => (
 );
 
 export const Footer = ({ onSelectCategory, onOpenPolicy, onOpenEnquiry }) => {
+  const handleEnquiryClick = (e) => {
+    if (e && typeof e.preventDefault === 'function') e.preventDefault();
+    if (typeof onOpenEnquiry === 'function') {
+      onOpenEnquiry();
+    } else {
+      window.location.hash = '#enquiry';
+    }
+  };
+
   return (
     <footer className="footer" id="main-footer">
       <div className="container">
@@ -109,7 +118,7 @@ export const Footer = ({ onSelectCategory, onOpenPolicy, onOpenEnquiry }) => {
                 <button
                   className="footer-link"
                   id="footer-customer-enquiry"
-                  onClick={onOpenEnquiry}
+                  onClick={handleEnquiryClick}
                 >
                   Customer Enquiry
                 </button>
@@ -167,7 +176,7 @@ export const Footer = ({ onSelectCategory, onOpenPolicy, onOpenEnquiry }) => {
                 type="button"
                 className="btn-enquiry-secondary footer-concierge-btn"
                 id="footer-concierge-enquiry-btn"
-                onClick={onOpenEnquiry}
+                onClick={handleEnquiryClick}
               >
                 <MessageSquareQuote size={15} />
                 <span>Submit Customer Enquiry</span>

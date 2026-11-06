@@ -14,6 +14,7 @@ import { CheckoutModal } from './components/CheckoutModal';
 import { OrderSuccessModal } from './components/OrderSuccessModal';
 import { SizeGuideModal } from './components/SizeGuideModal';
 import { PolicyModal } from './components/PolicyModal';
+import { EnquiryModal } from './components/EnquiryModal';
 import { AdminDashboard } from './components/AdminDashboard';
 import { Toast } from './components/Toast';
 import { WishlistPage } from './components/WishlistPage';
@@ -112,6 +113,7 @@ export function App() {
   const [activePolicy, setActivePolicy] = useState(null);
   const [isAdminOpen, setIsAdminOpen] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const [isEnquiryOpen, setIsEnquiryOpen] = useState(false);
 
   // Listen for browser Back/Forward (popstate)
   useEffect(() => {
@@ -156,6 +158,18 @@ export function App() {
     checkAdminRoute();
     window.addEventListener('hashchange', checkAdminRoute);
     return () => window.removeEventListener('hashchange', checkAdminRoute);
+  }, []);
+
+  // Listen for #enquiry in URL hash or /enquiry in pathname
+  useEffect(() => {
+    const checkEnquiryRoute = () => {
+      if (window.location.hash === '#enquiry' || window.location.pathname === '/enquiry') {
+        setIsEnquiryOpen(true);
+      }
+    };
+    checkEnquiryRoute();
+    window.addEventListener('hashchange', checkEnquiryRoute);
+    return () => window.removeEventListener('hashchange', checkEnquiryRoute);
   }, []);
 
   const handleCloseAdmin = () => {
@@ -386,6 +400,7 @@ export function App() {
       <Footer
         onSelectCategory={handleSelectCategory}
         onOpenPolicy={setActivePolicy}
+        onOpenEnquiry={() => setIsEnquiryOpen(true)}
       />
 
       {/* Slide-over Cart Drawer */}
@@ -427,6 +442,18 @@ export function App() {
         <PolicyModal
           policyType={activePolicy}
           onClose={() => setActivePolicy(null)}
+        />
+      )}
+
+      {/* Customer Enquiry Modal (Tally Integration) */}
+      {isEnquiryOpen && (
+        <EnquiryModal
+          onClose={() => {
+            setIsEnquiryOpen(false);
+            if (window.location.hash === '#enquiry' || window.location.pathname === '/enquiry') {
+              window.history.replaceState(null, '', '/');
+            }
+          }}
         />
       )}
 
