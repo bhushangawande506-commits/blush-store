@@ -1,7 +1,13 @@
-require('dotenv').config();
+const path = require('path');
+const dotenv = require('dotenv');
+
+// Robust environment variable resolution across execution contexts (root, server subdir, serverless)
+dotenv.config({ path: path.resolve(__dirname, '../.env') });
+dotenv.config({ path: path.resolve(__dirname, '.env') });
+dotenv.config();
+
 const express = require('express');
 const cors = require('cors');
-const path = require('path');
 const { initDatabase, checkDatabaseHealth } = require('./db');
 
 const productsRouter = require('./routes/products');
@@ -107,6 +113,7 @@ if (require.main === module) {
       console.log(` 📍 Location: Pune, Maharashtra, India (Est. 2014)`);
       console.log(` 🚀 Server listening on: http://localhost:${PORT}`);
       console.log(` 🛍️  API Endpoints ready at http://localhost:${PORT}/api/`);
+      console.log(` 🔐 Admin Auth: ${Boolean(process.env.ADMIN_KEY) ? 'CONFIGURED' : 'NOT CONFIGURED (Missing ADMIN_KEY)'}`);
       console.log(`===============================================`);
     });
   }).catch(err => {

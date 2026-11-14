@@ -78,7 +78,21 @@ function generateSlug(name) {
 
 // Retrieve and validate server-side ADMIN_KEY
 function getAdminKey() {
-  const key = process.env.ADMIN_KEY;
+  let key = process.env.ADMIN_KEY;
+  if (!key || !key.trim()) {
+    // Attempt fallback resolution from root .env and server/.env
+    try {
+      const dotenv = require('dotenv');
+      const path = require('path');
+      dotenv.config({ path: path.resolve(__dirname, '../../.env') });
+      dotenv.config({ path: path.resolve(__dirname, '../.env') });
+      dotenv.config({ path: path.resolve(__dirname, '.env') });
+      dotenv.config();
+      key = process.env.ADMIN_KEY;
+    } catch {
+      // Fallback silently
+    }
+  }
   if (!key || !key.trim()) {
     return null;
   }
@@ -95,6 +109,16 @@ function safeCompare(a, b) {
   if (bufA.length !== bufB.length) return false;
   return crypto.timingSafeEqual(bufA, bufB);
 }
+
+// GET /config: Check whether the admin authentication service is properly configured on the server
+router.get('/config', (req, res) => {
+  const adminKey = getAdminKey();
+  return res.json({
+    success: true,
+    configured: Boolean(adminKey),
+    service: 'Blush Boutique Admin Authentication'
+  });
+});
 
 // POST /verify: Authenticate admin credentials or verify existing session token
 router.post('/verify', (req, res) => {

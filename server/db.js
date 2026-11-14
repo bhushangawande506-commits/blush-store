@@ -18,10 +18,16 @@
  * =============================================================================
  */
 
-require('dotenv').config();
+const path = require('path');
+const dotenv = require('dotenv');
+
+// Robust environment variable resolution
+dotenv.config({ path: path.resolve(__dirname, '../.env') });
+dotenv.config({ path: path.resolve(__dirname, '.env') });
+dotenv.config();
+
 const { Pool } = require('pg');
 const fs = require('fs');
-const path = require('path');
 
 // 1. Connection URL Resolution
 const connectionString = process.env.SUPABASE_DATABASE_URL || process.env.DATABASE_URL;
