@@ -32,6 +32,16 @@ export function App() {
     const filterParam = searchParams.get('filter');
     const categoryParam = searchParams.get('category');
 
+    // 0. Check for /admin or #admin
+    if (pathname === '/admin' || window.location.hash === '#admin' || window.location.hash === '#/admin' || searchParams.get('admin') === 'true') {
+      return {
+        view: 'admin',
+        productSlug: null,
+        category: 'All',
+        filterMode: 'all'
+      };
+    }
+
     // 1. Check for /product/:slug (or ID)
     const productMatch = pathname.match(/^\/product\/([^/]+)/);
     if (productMatch) {
@@ -174,7 +184,9 @@ export function App() {
 
   const handleCloseAdmin = () => {
     setIsAdminOpen(false);
-    if (window.location.hash === '#admin') {
+    if (currentView === 'admin' || window.location.pathname === '/admin') {
+      navigate('/', { replace: true });
+    } else if (window.location.hash === '#admin') {
       window.history.replaceState(null, '', window.location.pathname + window.location.search);
     }
   };
@@ -474,8 +486,11 @@ export function App() {
       )}
 
       {/* Admin Dashboard */}
-      {isAdminOpen && (
-        <AdminDashboard onClose={handleCloseAdmin} />
+      {(isAdminOpen || currentView === 'admin') && (
+        <AdminDashboard
+          onClose={handleCloseAdmin}
+          isDedicatedRoute={currentView === 'admin' || window.location.pathname === '/admin'}
+        />
       )}
 
       {/* Toast Notification Pill */}
